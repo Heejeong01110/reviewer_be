@@ -16,13 +16,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.movie.reviewer.domain.movie.domain.Movie;
 import org.movie.reviewer.domain.user.domain.User;
+import org.movie.reviewer.global.common.BaseEntity;
 
 @Entity
 @Getter
 @Table(name = "rating")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Rating {
+public class Rating extends BaseEntity {
 
   @Id
   @Column
@@ -34,12 +35,6 @@ public class Rating {
 
   @Column
   private Float rating;
-
-  @Column
-  private LocalDateTime updatedAt;
-
-  @Column
-  private LocalDateTime createdAt;
 
 
   @ManyToOne(fetch = FetchType.LAZY)

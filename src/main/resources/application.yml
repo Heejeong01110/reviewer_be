@@ -24,6 +24,6 @@ spring:
       ddl-auto: create-drop
   sql:
     init:
-      data-locations: classpath:data/data.sql
+      data-locations: classpath:data/dummyData.sql
       mode: always
       platform: h2

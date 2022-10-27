@@ -21,6 +21,7 @@ import org.movie.reviewer.domain.movie.domain.Movie;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Actor {
+
   @Id
   @Column
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +31,7 @@ public class Actor {
   private String name;
 
 
-  @Column( length = 30)
+  @Column(length = 30)
   private String role;
 
   @ManyToOne(fetch = FetchType.LAZY)

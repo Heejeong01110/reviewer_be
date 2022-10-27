@@ -15,13 +15,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.movie.reviewer.domain.movie.domain.Movie;
 import org.movie.reviewer.domain.user.domain.User;
+import org.movie.reviewer.global.common.BaseEntity;
 
 @Entity
 @Getter
 @Table(name = "favorite")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Favorite {
+public class Favorite extends BaseEntity {
 
   @Id
   @Column

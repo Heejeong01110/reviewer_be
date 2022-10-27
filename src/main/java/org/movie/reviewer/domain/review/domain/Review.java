@@ -15,12 +15,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.movie.reviewer.domain.movie.domain.Movie;
 import org.movie.reviewer.domain.user.domain.User;
+import org.movie.reviewer.global.common.BaseEntity;
 
 @Entity
 @Getter
 @Table(name = "review")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Review {
+public class Review extends BaseEntity {
 
   @Id
   @Column
@@ -32,12 +33,6 @@ public class Review {
 
   @Column(nullable = false,  length = 50000)
   private String contents;
-
-  @Column
-  private LocalDateTime updatedAt;
-
-  @Column
-  private LocalDateTime createdAt;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(referencedColumnName = "id")
