@@ -29,11 +29,11 @@ public class ReviewComment {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false,  length = 300)
+  @Column(nullable = false, length = 300)
   private String contents;
 
   @Column
-  private Long like;
+  private Long likeCount;
 
   @Column
   private LocalDateTime updatedAt;

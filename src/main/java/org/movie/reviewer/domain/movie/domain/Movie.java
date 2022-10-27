@@ -32,11 +32,11 @@ public class Movie {
   @Column(nullable = false, length = 30)
   private String country;
 
-  @Column(nullable = false, length = 30)
+  @Column(nullable = false)
   private Long runningTime;
 
   @Column(nullable = false, length = 30)
-  private String moviePictureUrl;
+  private String movieImage;
 
   @Column(nullable = false,  length = 30)
   private String director;

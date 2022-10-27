@@ -18,7 +18,7 @@ import org.movie.reviewer.domain.user.domain.User;
 
 @Entity
 @Getter
-@Table(name = "rating_like")
+@Table(name = "review_like")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class ReviewLike {

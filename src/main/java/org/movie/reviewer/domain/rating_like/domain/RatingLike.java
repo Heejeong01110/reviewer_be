@@ -29,7 +29,7 @@ public class RatingLike {
   private Long id;
 
   @Column
-  private Long like;
+  private Long likeType;
 
 
   @ManyToOne(fetch = FetchType.LAZY)
