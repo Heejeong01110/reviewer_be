@@ -35,7 +35,7 @@ public class Movie {
   @Column(nullable = false)
   private Long runningTime;
 
-  @Column(nullable = false, length = 30)
+  @Column(nullable = false, length = 300)
   private String movieImage;
 
   @Column(nullable = false,  length = 30)
