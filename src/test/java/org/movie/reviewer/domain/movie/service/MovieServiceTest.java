@@ -17,11 +17,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.movie.reviewer.domain.movie.domain.Movie;
 import org.movie.reviewer.domain.movie.dto.MovieConverter;
 import org.movie.reviewer.domain.movie.dto.response.MovieResponse;
+import org.movie.reviewer.domain.movie.dto.response.MovieTitleResponse;
 import org.movie.reviewer.domain.movie.exception.NotFoundException;
 import org.movie.reviewer.domain.movie.repository.MovieRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.movie.reviewer.domain.rating.service.RatingService;
 
 @ExtendWith(MockitoExtension.class)
 class MovieServiceTest {
@@ -34,7 +33,7 @@ class MovieServiceTest {
   private MovieRepository movieRepository;
 
   @Mock
-  private Pageable pageable;
+  private RatingService ratingService;
 
   private Movie movie1 = Movie.builder()
       .id(0L)
@@ -63,22 +62,32 @@ class MovieServiceTest {
   private MovieResponse movieResponse1 = MovieConverter.toMovieResponse(movie1);
   private MovieResponse movieResponse2 = MovieConverter.toMovieResponse(movie2);
 
+  private MovieTitleResponse movieTitleResponse1 =
+      MovieConverter.toMovieTitleResponse(MovieConverter.toMovieTitleResponse(movie1), 5F);
+  private MovieTitleResponse movieTitleResponse2 =
+      MovieConverter.toMovieTitleResponse(MovieConverter.toMovieTitleResponse(movie2), 3F);
+
   @Test
-  void getMovieList() {
+  void getMovieTitleList() {
     //given
     List<Movie> movies = List.of(movie1, movie2);
-    Page<MovieResponse> movieResponses = new PageImpl<>(List.of(movieResponse1, movieResponse2));
 
     given(movieRepository.findAll()).willReturn(movies);
+    given(ratingService.getRatingScoreByMovieId(movie1.getId()))
+        .willReturn(movieTitleResponse1.getRating());
+    given(ratingService.getRatingScoreByMovieId(movie2.getId()))
+        .willReturn(movieTitleResponse2.getRating());
 
     //when
-    List<MovieResponse> expected = movieService.getMovieList();
+    List<MovieTitleResponse> actual = movieService.getMovieTitleList();
 
     //then
     then(movieRepository).should().findAll();
-    then(movieService).should().getMovieList();
+    then(ratingService).should().getRatingScoreByMovieId(movie1.getId());
+    then(ratingService).should().getRatingScoreByMovieId(movie2.getId());
+    then(movieService).should().getMovieTitleList();
 
-    List<MovieResponse> actual = movieResponses.toList();
+    List<MovieTitleResponse> expected = List.of(movieTitleResponse1, movieTitleResponse2);
     assertThat(actual.get(0), samePropertyValuesAs(expected.get(0)));
     assertThat(actual.get(1), samePropertyValuesAs(expected.get(1)));
 
@@ -94,6 +103,7 @@ class MovieServiceTest {
 
     //then
     then(movieRepository).should().findMovieById(movie1.getId());
+    then(movieService).should().getMovieById(movie1.getId());
 
     assertThat(actual, samePropertyValuesAs(movieResponse1));
 
@@ -110,6 +120,7 @@ class MovieServiceTest {
 
     //then
     then(movieRepository).should().findMovieById(3L);
+    then(movieService).should().getMovieById(3L);
 
 
   }

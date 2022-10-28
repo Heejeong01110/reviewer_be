@@ -3,6 +3,7 @@ package org.movie.reviewer.domain.movie.api;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.movie.reviewer.domain.movie.dto.response.MovieResponse;
+import org.movie.reviewer.domain.movie.dto.response.MovieTitleResponse;
 import org.movie.reviewer.domain.movie.service.MovieService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +19,8 @@ public class MovieApi {
   private final MovieService movieService;
 
   @GetMapping("movies")
-  public ResponseEntity<List<MovieResponse>> getMovies() {
-    return ResponseEntity.ok(movieService.getMovieList());
+  public ResponseEntity<List<MovieTitleResponse>> getMovies() {
+    return ResponseEntity.ok(movieService.getMovieTitleList());
   }
 
   @GetMapping("movies/{movieId}")

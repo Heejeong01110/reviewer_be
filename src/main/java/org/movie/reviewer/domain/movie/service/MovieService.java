@@ -4,8 +4,10 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.movie.reviewer.domain.movie.dto.MovieConverter;
 import org.movie.reviewer.domain.movie.dto.response.MovieResponse;
+import org.movie.reviewer.domain.movie.dto.response.MovieTitleResponse;
 import org.movie.reviewer.domain.movie.exception.NotFoundException;
 import org.movie.reviewer.domain.movie.repository.MovieRepository;
+import org.movie.reviewer.domain.rating.service.RatingService;
 import org.movie.reviewer.global.exception.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,9 +18,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class MovieService {
 
   private final MovieRepository movieRepository;
+  private final RatingService ratingService;
 
-  public List<MovieResponse> getMovieList() {
-    return movieRepository.findAll().stream().map(MovieConverter::toMovieResponse).toList();
+  public List<MovieTitleResponse> getMovieTitleList() {
+    return movieRepository.findAll().stream()
+        .map(MovieConverter::toMovieTitleResponse)
+        .map(movie -> MovieConverter.toMovieTitleResponse(
+            movie,
+            ratingService.getRatingScoreByMovieId(movie.getId())
+        )).toList();
   }
 
   public MovieResponse getMovieById(Long movieId) {
