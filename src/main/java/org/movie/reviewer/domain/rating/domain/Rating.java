@@ -1,6 +1,5 @@
 package org.movie.reviewer.domain.rating.domain;
 
-import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -34,7 +33,7 @@ public class Rating extends BaseEntity {
   private String contents;
 
   @Column
-  private Float rating;
+  private Double rating;
 
 
   @ManyToOne(fetch = FetchType.LAZY)

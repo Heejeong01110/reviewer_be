@@ -12,7 +12,7 @@ public class RatingService {
 
   private final RatingRepository ratingRepository;
 
-  public Float getRatingScoreByMovieId(Long movieId) {
+  public Double getRatingScoreByMovieId(Long movieId) {
     return ratingRepository.getRatingAvgByMovieId(movieId);
   }
 

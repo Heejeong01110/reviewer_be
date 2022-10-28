@@ -17,6 +17,6 @@ public class MovieTitleResponse {
 
   private String movieImage;
 
-  private Float rating;
+  private Double rating;
 
 }

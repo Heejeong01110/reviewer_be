@@ -29,11 +29,11 @@ class RatingServiceTest {
   void getRatingScoreByMovieId() {
     //given
     Long movieId = 0L;
-    Float actual = 5F;
+    Double actual = 5.0;
     given(ratingRepository.getRatingAvgByMovieId(movieId)).willReturn(actual);
 
     //when
-    Float expected = ratingService.getRatingScoreByMovieId(movieId);
+    Double expected = ratingService.getRatingScoreByMovieId(movieId);
 
     //then
     then(ratingRepository).should().getRatingAvgByMovieId(movieId);

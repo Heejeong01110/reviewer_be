@@ -14,6 +14,6 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
       + "GROUP BY m.id "
       + "HAVING m.id = :movieId"
   )
-  Float getRatingAvgByMovieId(Long movieId);
+  Double getRatingAvgByMovieId(Long movieId);
 
 }

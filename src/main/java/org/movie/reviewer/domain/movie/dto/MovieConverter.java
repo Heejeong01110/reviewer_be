@@ -29,7 +29,7 @@ public class MovieConverter {
         .build();
   }
 
-  public static MovieTitleResponse toMovieTitleResponse(MovieTitleResponse response, Float rating) {
+  public static MovieTitleResponse toMovieTitleResponse(MovieTitleResponse response, Double rating) {
     return MovieTitleResponse.builder()
         .id(response.getId())
         .title(response.getTitle())

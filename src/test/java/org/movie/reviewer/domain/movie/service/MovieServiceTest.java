@@ -63,9 +63,9 @@ class MovieServiceTest {
   private MovieResponse movieResponse2 = MovieConverter.toMovieResponse(movie2);
 
   private MovieTitleResponse movieTitleResponse1 =
-      MovieConverter.toMovieTitleResponse(MovieConverter.toMovieTitleResponse(movie1), 5F);
+      MovieConverter.toMovieTitleResponse(MovieConverter.toMovieTitleResponse(movie1), 5.0);
   private MovieTitleResponse movieTitleResponse2 =
-      MovieConverter.toMovieTitleResponse(MovieConverter.toMovieTitleResponse(movie2), 3F);
+      MovieConverter.toMovieTitleResponse(MovieConverter.toMovieTitleResponse(movie2), 3.0);
 
   @Test
   void getMovieTitleList() {
