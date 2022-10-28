@@ -66,19 +66,18 @@ class MovieServiceTest {
   @Test
   void getMovieList() {
     //given
-    Page<Movie> movies = new PageImpl<>(List.of(movie1, movie2));
+    List<Movie> movies = List.of(movie1, movie2);
     Page<MovieResponse> movieResponses = new PageImpl<>(List.of(movieResponse1, movieResponse2));
 
-    given(movieRepository.findAllBySorting(pageable)).willReturn(movies);
+    given(movieRepository.findAll()).willReturn(movies);
 
     //when
-    Page<MovieResponse> movieList = movieService.getMovieList(pageable);
+    List<MovieResponse> expected = movieService.getMovieList();
 
     //then
-    then(movieRepository).should().findAllBySorting(pageable);
-    then(movieService).should().getMovieList(pageable);
+    then(movieRepository).should().findAll();
+    then(movieService).should().getMovieList();
 
-    List<MovieResponse> expected = movieList.toList();
     List<MovieResponse> actual = movieResponses.toList();
     assertThat(actual.get(0), samePropertyValuesAs(expected.get(0)));
     assertThat(actual.get(1), samePropertyValuesAs(expected.get(1)));
@@ -88,7 +87,7 @@ class MovieServiceTest {
   @Test
   void getMovieById() {
     //given
-    given(movieRepository.findMovieById(movie1.getId())).willReturn(Optional.of(movieResponse1));
+    given(movieRepository.findMovieById(movie1.getId())).willReturn(Optional.of(movie1));
 
     //when
     MovieResponse actual = movieService.getMovieById(movie1.getId());
