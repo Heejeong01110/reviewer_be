@@ -1,7 +1,6 @@
-package org.movie.reviewer.domain.movie.exception;
+package org.movie.reviewer.global.exception;
 
 import java.text.MessageFormat;
-import org.movie.reviewer.global.exception.ErrorMessage;
 
 public class NotFoundException extends RuntimeException {
 

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.movie.reviewer.domain.movie.dto.MovieConverter;
 import org.movie.reviewer.domain.movie.dto.response.MovieDetailResponse;
 import org.movie.reviewer.domain.movie.dto.response.MovieTitleResponse;
-import org.movie.reviewer.domain.movie.exception.NotFoundException;
+import org.movie.reviewer.global.exception.NotFoundException;
 import org.movie.reviewer.domain.movie.repository.MovieRepository;
 import org.movie.reviewer.global.exception.ErrorMessage;
 import org.springframework.stereotype.Service;
