@@ -1,39 +1,36 @@
 package org.movie.reviewer.domain.movie.dto;
 
+import java.util.List;
 import org.movie.reviewer.domain.movie.domain.Movie;
-import org.movie.reviewer.domain.movie.dto.response.MovieResponse;
+import org.movie.reviewer.domain.movie.dto.response.ActorInfo;
+import org.movie.reviewer.domain.movie.dto.response.MovieDetailResponse;
 import org.movie.reviewer.domain.movie.dto.response.MovieTitleResponse;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MovieConverter {
 
-  public static MovieResponse toMovieResponse(Movie movie) {
-    return MovieResponse.builder()
-        .id(movie.getId())
-        .title(movie.getTitle())
-        .director(movie.getDirector())
-        .genre(movie.getGenre())
-        .country(movie.getCountry())
-        .runningTime(movie.getRunningTime())
-        .summary(movie.getSummary())
-        .movieImage(movie.getMovieImage())
-        .build();
-  }
-
-  public static MovieTitleResponse toMovieTitleResponse(Movie movie) {
-    return MovieTitleResponse.builder()
-        .id(movie.getId())
-        .title(movie.getTitle())
-        .movieImage(movie.getMovieImage())
-        .build();
-  }
-
-  public static MovieTitleResponse toMovieTitleResponse(MovieTitleResponse response, Double rating) {
-    return MovieTitleResponse.builder()
+  public static MovieDetailResponse toMovieDetailResponse(MovieDetailResponse response,
+      List<ActorInfo> actors) {
+    return MovieDetailResponse.builder()
         .id(response.getId())
         .title(response.getTitle())
         .movieImage(response.getMovieImage())
+        .genre(response.getGenre())
+        .rating(response.getRating())
+        .country(response.getCountry())
+        .runningTime(response.getRunningTime())
+        .summary(response.getSummary())
+        .director(response.getDirector())
+        .actors(actors)
+        .build();
+  }
+
+  public static MovieTitleResponse toMovieTitleResponse(Movie movie, Double rating) {
+    return MovieTitleResponse.builder()
+        .id(movie.getId())
+        .title(movie.getTitle())
+        .movieImage(movie.getMovieImage())
         .rating(rating)
         .build();
   }

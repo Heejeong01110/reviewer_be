@@ -1,4 +1,4 @@
-package org.movie.reviewer.domain.actor.domain;
+package org.movie.reviewer.domain.movie.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,7 +13,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.movie.reviewer.domain.movie.domain.Movie;
 
 @Entity
 @Getter

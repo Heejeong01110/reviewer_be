@@ -23,8 +23,10 @@ public class MovieService {
   }
 
   public MovieDetailResponse getMovieById(Long movieId) {
-    return movieRepository.findMovieById(movieId).map(MovieConverter::toMovieResponse)
-        .orElseThrow(() -> new NotFoundException(ErrorMessage.MOVIE_NOT_FOUNDED, movieId));
+    return MovieConverter.toMovieDetailResponse(
+        movieRepository.findMovieDetailById(movieId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.MOVIE_NOT_FOUNDED, movieId)),
+        movieRepository.findActorsByMovieId(movieId));
   }
 
 }

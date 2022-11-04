@@ -2,7 +2,7 @@ package org.movie.reviewer.domain.movie.api;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.movie.reviewer.domain.movie.dto.response.MovieResponse;
+import org.movie.reviewer.domain.movie.dto.response.MovieDetailResponse;
 import org.movie.reviewer.domain.movie.dto.response.MovieTitleResponse;
 import org.movie.reviewer.domain.movie.service.MovieService;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class MovieApi {
   }
 
   @GetMapping("movies/{movieId}")
-  public ResponseEntity<MovieResponse> getMovie(@PathVariable("movieId") Long movieId) {
+  public ResponseEntity<MovieDetailResponse> getMovie(@PathVariable("movieId") Long movieId) {
     return ResponseEntity.ok(movieService.getMovieById(movieId));
   }
 }
