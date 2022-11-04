@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.movie.reviewer.domain.movie.domain.Movie;
@@ -42,4 +43,13 @@ public class Review extends BaseEntity {
   @JoinColumn(referencedColumnName = "id")
   private Movie movie;
 
+  @Builder
+  public Review(Long id, String title, String contents,
+      User user, Movie movie) {
+    this.id = id;
+    this.title = title;
+    this.contents = contents;
+    this.user = user;
+    this.movie = movie;
+  }
 }
