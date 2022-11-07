@@ -35,4 +35,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
       + "WHERE r.id = :id"
   )
   Optional<ReviewDetailInfo> findReviewDetailById(@Param("id") Long reviewId);
+
+  List<Review> findReviewsByMovieId(Long movieId);
 }

@@ -68,6 +68,7 @@ class MovieServiceTest {
       ActorInfo.builder().id(3L).name("유해진").role("고광렬").build(),
       ActorInfo.builder().id(4L).name("김응수").role("곽철용").build()
   );
+
   private MovieDetailResponse movieDetailResponse1 = MovieDetailResponse.builder()
       .id(0L)
       .country("KR")
@@ -83,6 +84,7 @@ class MovieServiceTest {
       .build();
 
   private MovieTitleResponse movieTitleResponse1 = MovieConverter.toMovieTitleResponse(movie1, 5.0);
+
   private MovieTitleResponse movieTitleResponse2 = MovieConverter.toMovieTitleResponse(movie2, 3.0);
 
   @Test

@@ -23,6 +23,7 @@ import org.movie.reviewer.domain.review.domain.Review;
 import org.movie.reviewer.domain.review.dto.ReviewConverter;
 import org.movie.reviewer.domain.review.dto.response.ReviewDetailInfo;
 import org.movie.reviewer.domain.review.dto.response.ReviewDetailResponse;
+import org.movie.reviewer.domain.review.dto.response.ReviewSimpleResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleInfo;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleResponse;
 import org.movie.reviewer.domain.review.repository.ReviewRepository;
@@ -123,17 +124,13 @@ class ReviewServiceTest {
     assertThat(actual.size(), is(2));
     assertThat(actual.size(), is(expected.size()));
 
-    assertThat(actual.get(0).getTitle(), is(equalTo(expected.get(0).getTitle())));
-    assertThat(actual.get(0).getId(), is(expected.get(0).getId()));
-    assertThat(actual.get(0).getCommentCount(), is(expected.get(0).getCommentCount()));
-    assertThat(actual.get(0).getUser(), samePropertyValuesAs(expected.get(0).getUser()));
-    assertThat(actual.get(0).getMovie(), samePropertyValuesAs(expected.get(0).getMovie()));
-
-    assertThat(actual.get(1).getTitle(), is(equalTo(expected.get(1).getTitle())));
-    assertThat(actual.get(1).getId(), is(expected.get(1).getId()));
-    assertThat(actual.get(1).getCommentCount(), is(expected.get(1).getCommentCount()));
-    assertThat(actual.get(1).getUser(), samePropertyValuesAs(expected.get(1).getUser()));
-    assertThat(actual.get(1).getMovie(), samePropertyValuesAs(expected.get(1).getMovie()));
+    for (int i = 0; i < actual.size(); i++) {
+      assertThat(actual.get(i).getTitle(), is(equalTo(expected.get(i).getTitle())));
+      assertThat(actual.get(i).getId(), is(expected.get(i).getId()));
+      assertThat(actual.get(i).getCommentCount(), is(expected.get(i).getCommentCount()));
+      assertThat(actual.get(i).getUser(), samePropertyValuesAs(expected.get(i).getUser()));
+      assertThat(actual.get(i).getMovie(), samePropertyValuesAs(expected.get(i).getMovie()));
+    }
 
   }
 
@@ -190,4 +187,56 @@ class ReviewServiceTest {
     assertThat(actual.getMovie(), samePropertyValuesAs(movieCardInfo));
     assertThat(actual.getUser(), samePropertyValuesAs(userSimpleInfo));
   }
+
+  @Test
+  void getSimpleReviewsByMovieId() {
+    //given
+    ReviewSimpleResponse response1 = ReviewSimpleResponse.builder()
+        .id(review1.getId())
+        .title(review1.getTitle())
+        .contents(review1.getContents())
+        .updatedAt(LocalDateTime.now())
+        .user(UserSimpleInfo.builder()
+            .id(review1.getUser().getId())
+            .nickname(review1.getUser().getNickname())
+            .profileImage(review1.getUser().getProfileImage())
+            .build())
+        .build();
+
+    ReviewSimpleResponse response2 = ReviewSimpleResponse.builder()
+        .id(review2.getId())
+        .title(review2.getTitle())
+        .contents(review2.getContents())
+        .updatedAt(LocalDateTime.now())
+        .user(UserSimpleInfo.builder()
+            .id(review2.getUser().getId())
+            .nickname(review2.getUser().getNickname())
+            .profileImage(review2.getUser().getProfileImage())
+            .build())
+        .build();
+
+    List<ReviewSimpleResponse> expected = List.of(response1, response2);
+
+    given(reviewRepository.findReviewsByMovieId(movie.getId()))
+        .willReturn(List.of(review1, review2));
+
+    //when
+    List<ReviewSimpleResponse> actual = reviewService.getSimpleReviewsByMovieId(movie.getId());
+
+    //then
+    then(reviewService).should().getSimpleReviewsByMovieId(movie.getId());
+    then(reviewRepository).should().findReviewsByMovieId(movie.getId());
+
+    assertThat(actual.size(), is(2));
+    assertThat(actual.size(), is(expected.size()));
+
+    for (int i = 0; i < actual.size(); i++) {
+      assertThat(actual.get(i).getId(), is(expected.get(i).getId()));
+      assertThat(actual.get(i).getTitle(), equalTo(expected.get(i).getTitle()));
+      assertThat(actual.get(i).getContents(), equalTo(expected.get(i).getContents()));
+      assertThat(actual.get(i).getUser(), samePropertyValuesAs(expected.get(i).getUser()));
+    }
+
+  }
+
 }

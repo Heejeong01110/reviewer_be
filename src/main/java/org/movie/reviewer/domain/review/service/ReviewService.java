@@ -6,6 +6,7 @@ import org.movie.reviewer.domain.rating.service.RatingService;
 import org.movie.reviewer.domain.review.dto.ReviewConverter;
 import org.movie.reviewer.domain.review.dto.response.ReviewDetailInfo;
 import org.movie.reviewer.domain.review.dto.response.ReviewDetailResponse;
+import org.movie.reviewer.domain.review.dto.response.ReviewSimpleResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleResponse;
 import org.movie.reviewer.domain.review.repository.ReviewRepository;
 import org.movie.reviewer.global.exception.ErrorMessage;
@@ -32,5 +33,10 @@ public class ReviewService {
         .orElseThrow(() -> new NotFoundException(ErrorMessage.REVIEW_NOT_FOUNDED, reviewId));
     return ReviewConverter.toReviewDetailResponse(
         reviewDetailInfo, ratingService.getRatingScoreByMovieId(reviewDetailInfo.getMovieId()));
+  }
+
+  public List<ReviewSimpleResponse> getSimpleReviewsByMovieId(Long movieId) {
+    return ReviewConverter.toReviewSimpleResponse(
+        reviewRepository.findReviewsByMovieId(movieId));
   }
 }

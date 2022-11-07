@@ -1,9 +1,12 @@
 package org.movie.reviewer.domain.review.dto;
 
+import java.util.List;
 import org.movie.reviewer.domain.movie.dto.response.MovieCardInfo;
 import org.movie.reviewer.domain.movie.dto.response.MovieSimpleInfo;
+import org.movie.reviewer.domain.review.domain.Review;
 import org.movie.reviewer.domain.review.dto.response.ReviewDetailInfo;
 import org.movie.reviewer.domain.review.dto.response.ReviewDetailResponse;
+import org.movie.reviewer.domain.review.dto.response.ReviewSimpleResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleInfo;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleResponse;
 import org.movie.reviewer.domain.user.dto.response.UserSimpleInfo;
@@ -43,8 +46,7 @@ public class ReviewConverter {
                 .id(info.getUserId())
                 .nickname(info.getNickname())
                 .profileImage(info.getProfileImage())
-                .build()
-        )
+                .build())
         .movie(
             MovieCardInfo.builder()
                 .id(info.getMovieId())
@@ -54,8 +56,24 @@ public class ReviewConverter {
                 .country(info.getCountry())
                 .runningTime(info.getRunningTime())
                 .rating(rating)
-                .build()
-        )
+                .build())
         .build();
+  }
+
+  public static List<ReviewSimpleResponse> toReviewSimpleResponse(List<Review> reviews) {
+    return reviews.stream().map(review ->
+            ReviewSimpleResponse.builder()
+                .id(review.getId())
+                .title(review.getTitle())
+                .contents(review.getContents())
+                .updatedAt(review.getUpdatedAt())
+                .user(
+                    UserSimpleInfo.builder()
+                        .id(review.getUser().getId())
+                        .nickname(review.getUser().getNickname())
+                        .profileImage(review.getUser().getProfileImage())
+                        .build())
+                .build())
+        .toList();
   }
 }
