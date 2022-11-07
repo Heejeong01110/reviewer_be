@@ -1,6 +1,5 @@
 package org.movie.reviewer.domain.review_comment.domain;
 
-import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
