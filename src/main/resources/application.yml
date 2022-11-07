@@ -22,6 +22,9 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
   sql:
     init:
       data-locations: classpath:data/dummyData.sql
