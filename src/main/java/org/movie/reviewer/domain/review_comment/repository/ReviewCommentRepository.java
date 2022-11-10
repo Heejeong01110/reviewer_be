@@ -10,7 +10,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReviewCommentRepository extends JpaRepository<ReviewComment, Long> {
 
-  @Query("SELECT DISTINCT c FROM ReviewComment c join fetch c.user where c.review.id = :id")
+  @Query("SELECT DISTINCT c FROM ReviewComment c "
+      + "JOIN FETCH c.user "
+      + "WHERE c.review.id = :id")
   List<ReviewComment> findReviewCommentsByReviewId(@Param("id") Long reviewId);
 
 }
