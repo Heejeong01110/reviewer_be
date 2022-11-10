@@ -7,7 +7,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +33,7 @@ public class User extends BaseEntity {
   private String nickname;
 
   @Column(length = 50000)
-  private String Introduction;
+  private String introduction;
 
   @Column(length = 200)
   private String profileImage;
@@ -46,7 +45,7 @@ public class User extends BaseEntity {
     this.email = email;
     this.password = password;
     this.nickname = nickname;
-    Introduction = introduction;
+    this.introduction = introduction;
     this.profileImage = profileImage;
   }
 }
