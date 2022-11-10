@@ -90,24 +90,21 @@ class MovieServiceTest {
   @Test
   void getMovieTitleList() {
     //given
-    List<Movie> movies = List.of(movie1, movie2);
+    List<MovieTitleResponse> movies = List.of(
+        MovieConverter.toMovieTitleResponse(movie1, movieTitleResponse1.getRating()),
+        MovieConverter.toMovieTitleResponse(movie2, movieTitleResponse2.getRating()));
 
-    given(movieRepository.findAll()).willReturn(movies);
-    given(ratingService.getRatingScoreByMovieId(movie1.getId()))
-        .willReturn(movieTitleResponse1.getRating());
-    given(ratingService.getRatingScoreByMovieId(movie2.getId()))
-        .willReturn(movieTitleResponse2.getRating());
+    List<MovieTitleResponse> expected = List.of(movieTitleResponse1, movieTitleResponse2);
+
+    given(movieRepository.findMovieTitleAll()).willReturn(movies);
 
     //when
     List<MovieTitleResponse> actual = movieService.getMovieTitleList();
 
     //then
-    then(movieRepository).should().findAll();
-    then(ratingService).should().getRatingScoreByMovieId(movie1.getId());
-    then(ratingService).should().getRatingScoreByMovieId(movie2.getId());
     then(movieService).should().getMovieTitleList();
+    then(movieRepository).should().findMovieTitleAll();
 
-    List<MovieTitleResponse> expected = List.of(movieTitleResponse1, movieTitleResponse2);
     assertThat(actual.get(0), samePropertyValuesAs(expected.get(0)));
     assertThat(actual.get(1), samePropertyValuesAs(expected.get(1)));
 
