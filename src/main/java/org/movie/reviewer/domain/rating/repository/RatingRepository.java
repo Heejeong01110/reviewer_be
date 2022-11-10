@@ -1,8 +1,10 @@
 package org.movie.reviewer.domain.rating.repository;
 
+import java.util.List;
 import org.movie.reviewer.domain.rating.domain.Rating;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -16,4 +18,8 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
   )
   Double getRatingAvgByMovieId(Long movieId);
 
+  @Query("SELECT DISTINCT r FROM Rating r "
+      + "JOIN FETCH r.user "
+      + "WHERE r.movie.id = :id")
+  List<Rating> getRatingsByMovieId(@Param("id") Long movieId);
 }
