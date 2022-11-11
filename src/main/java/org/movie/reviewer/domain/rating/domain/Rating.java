@@ -37,6 +37,8 @@ public class Rating extends BaseEntity {
   @Column
   private Double rating;
 
+  @Column(nullable = false)
+  private Long likeCount;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(referencedColumnName = "id")

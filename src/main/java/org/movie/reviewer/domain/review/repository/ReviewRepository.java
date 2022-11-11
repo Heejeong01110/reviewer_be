@@ -37,4 +37,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
   Optional<ReviewDetailInfo> findReviewDetailById(@Param("id") Long reviewId);
 
   List<Review> findReviewsByMovieId(Long movieId);
+
+  @Query("SELECT DISTINCT r FROM Review r "
+      + "JOIN FETCH r.movie "
+      + "WHERE r.user.id = :id")
+  List<Review> findReviewsByUserId(@Param("id") Long userId);
 }

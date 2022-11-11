@@ -2,6 +2,7 @@ package org.movie.reviewer.domain.rating.dto;
 
 import org.movie.reviewer.domain.rating.domain.Rating;
 import org.movie.reviewer.domain.rating.dto.response.RatingResponse;
+import org.movie.reviewer.domain.rating.dto.response.UserRatingInfo;
 import org.movie.reviewer.domain.user.dto.response.UserSimpleInfo;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,15 @@ public class RatingConverter {
                 .nickname(rating.getUser().getNickname())
                 .profileImage(rating.getUser().getProfileImage())
                 .build())
+        .build();
+  }
+
+  public static UserRatingInfo toUserRatingInfo(Rating rating) {
+    return UserRatingInfo.builder()
+        .id(rating.getId())
+        .contents(rating.getContents())
+        .updatedAt(rating.getUpdatedAt())
+        .likeCount(rating.getLikeCount())
         .build();
   }
 }

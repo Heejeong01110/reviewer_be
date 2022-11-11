@@ -8,6 +8,7 @@ import org.movie.reviewer.domain.review.dto.response.ReviewDetailInfo;
 import org.movie.reviewer.domain.review.dto.response.ReviewDetailResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewSimpleResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleResponse;
+import org.movie.reviewer.domain.review.dto.response.UserReviewInfo;
 import org.movie.reviewer.domain.review.repository.ReviewRepository;
 import org.movie.reviewer.global.exception.ErrorMessage;
 import org.movie.reviewer.global.exception.NotFoundException;
@@ -38,5 +39,10 @@ public class ReviewService {
   public List<ReviewSimpleResponse> getSimpleReviewsByMovieId(Long movieId) {
     return ReviewConverter.toReviewSimpleResponse(
         reviewRepository.findReviewsByMovieId(movieId));
+  }
+
+  public List<UserReviewInfo> getReviewsByUserId(Long userId) {
+    return reviewRepository.findReviewsByUserId(userId)
+        .stream().map(ReviewConverter::toUserReviewInfo).toList();
   }
 }

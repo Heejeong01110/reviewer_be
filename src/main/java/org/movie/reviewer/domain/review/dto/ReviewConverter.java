@@ -9,6 +9,7 @@ import org.movie.reviewer.domain.review.dto.response.ReviewDetailResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewSimpleResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleInfo;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleResponse;
+import org.movie.reviewer.domain.review.dto.response.UserReviewInfo;
 import org.movie.reviewer.domain.user.dto.response.UserSimpleInfo;
 import org.springframework.stereotype.Component;
 
@@ -75,5 +76,20 @@ public class ReviewConverter {
                         .build())
                 .build())
         .toList();
+  }
+
+  public static UserReviewInfo toUserReviewInfo(Review review) {
+    return UserReviewInfo.builder()
+        .id(review.getId())
+        .title(review.getTitle())
+        .updatedAt(review.getUpdatedAt())
+        .likeCount(review.getLikeCount())
+        .movie(
+            MovieSimpleInfo.builder()
+                .id(review.getMovie().getId())
+                .title(review.getMovie().getTitle())
+                .movieImage(review.getMovie().getMovieImage())
+                .build())
+        .build();
   }
 }

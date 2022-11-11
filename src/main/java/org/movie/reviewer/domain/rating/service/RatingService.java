@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.movie.reviewer.domain.rating.dto.RatingConverter;
 import org.movie.reviewer.domain.rating.dto.response.RatingResponse;
+import org.movie.reviewer.domain.rating.dto.response.UserRatingInfo;
 import org.movie.reviewer.domain.rating.repository.RatingRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,4 +24,10 @@ public class RatingService {
     return ratingRepository.getRatingsByMovieId(movieId)
         .stream().map(RatingConverter::toRatingResponse).toList();
   }
+
+  public List<UserRatingInfo> getRatingsByUserId(Long userId) {
+    return ratingRepository.getRatingsByUserId(userId)
+        .stream().map(RatingConverter::toUserRatingInfo).toList();
+  }
+
 }

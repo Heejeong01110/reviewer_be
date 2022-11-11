@@ -1,6 +1,5 @@
 package org.movie.reviewer.domain.review.domain;
 
-import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,8 +20,10 @@ import org.movie.reviewer.global.common.BaseEntity;
 
 @Entity
 @Getter
+@Builder
 @Table(name = "review")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Review extends BaseEntity {
 
   @Id
@@ -29,11 +31,14 @@ public class Review extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false,  length = 500)
+  @Column(nullable = false, length = 500)
   private String title;
 
-  @Column(nullable = false,  length = 50000)
+  @Column(nullable = false, length = 50000)
   private String contents;
+
+  @Column(nullable = false)
+  private Long likeCount;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(referencedColumnName = "id")
@@ -43,13 +48,4 @@ public class Review extends BaseEntity {
   @JoinColumn(referencedColumnName = "id")
   private Movie movie;
 
-  @Builder
-  public Review(Long id, String title, String contents,
-      User user, Movie movie) {
-    this.id = id;
-    this.title = title;
-    this.contents = contents;
-    this.user = user;
-    this.movie = movie;
-  }
 }
