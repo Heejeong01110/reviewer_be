@@ -4,7 +4,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.movie.reviewer.domain.favorite.dto.response.UserFavoriteResponse;
 import org.movie.reviewer.domain.favorite.service.FavoriteService;
-import org.movie.reviewer.domain.review_comment.dto.response.UserCommentResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

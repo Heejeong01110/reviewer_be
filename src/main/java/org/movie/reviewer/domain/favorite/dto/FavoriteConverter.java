@@ -3,8 +3,6 @@ package org.movie.reviewer.domain.favorite.dto;
 import org.movie.reviewer.domain.favorite.domain.Favorite;
 import org.movie.reviewer.domain.favorite.dto.response.UserFavoriteResponse;
 import org.movie.reviewer.domain.movie.dto.response.MovieSimpleInfo;
-import org.movie.reviewer.domain.review.domain.Review;
-import org.movie.reviewer.domain.review.dto.response.UserReviewResponse;
 import org.springframework.stereotype.Component;
 
 @Component

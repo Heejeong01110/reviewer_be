@@ -1,12 +1,9 @@
 package org.movie.reviewer.domain.rating.service;
 
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.samePropertyValuesAs;
-import static org.mockito.BDDMockito.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -21,6 +18,7 @@ import org.movie.reviewer.domain.movie.domain.Movie;
 import org.movie.reviewer.domain.rating.domain.Rating;
 import org.movie.reviewer.domain.rating.dto.RatingConverter;
 import org.movie.reviewer.domain.rating.dto.response.RatingResponse;
+import org.movie.reviewer.domain.rating.dto.response.UserRatingResponse;
 import org.movie.reviewer.domain.rating.repository.RatingRepository;
 import org.movie.reviewer.domain.user.domain.User;
 
@@ -104,11 +102,39 @@ class RatingServiceTest {
 
     assertThat(actual.size(), is(2));
     assertThat(actual.size(), is(actual.size()));
-    for(int i=0;i<actual.size();i++){
+    for (int i = 0; i < actual.size(); i++) {
       assertThat(actual.get(i).getId(), is(expected.get(i).getId()));
       assertThat(actual.get(i).getContents(), is(expected.get(i).getContents()));
       assertThat(actual.get(i).getRating(), is(expected.get(i).getRating()));
       assertThat(actual.get(i).getUser(), samePropertyValuesAs(expected.get(i).getUser()));
     }
+  }
+
+  @Test
+  void getRatingsByUserId() {
+    //given
+    List<UserRatingResponse> expected = List.of(
+        RatingConverter.toUserRatingResponse(rating1),
+        RatingConverter.toUserRatingResponse(rating2));
+
+    given(ratingRepository.getRatingsByUserId(user.getId())).willReturn(List.of(rating1, rating2));
+
+    //when
+    List<UserRatingResponse> actual = ratingService.getRatingsByUserId(user.getId());
+
+    //then
+    then(ratingService).should().getRatingsByUserId(user.getId());
+    then(ratingRepository).should().getRatingsByUserId(user.getId());
+
+    assertThat(actual.size(), is(2));
+    assertThat(actual.size(), is(actual.size()));
+    for (int i = 0; i < actual.size(); i++) {
+      assertThat(actual.get(i).getId(), is(expected.get(i).getId()));
+      assertThat(actual.get(i).getContents(), is(expected.get(i).getContents()));
+      assertThat(actual.get(i).getLikeCount(), is(expected.get(i).getLikeCount()));
+      assertThat(actual.get(i).getUpdatedAt(), is(expected.get(i).getUpdatedAt()));
+      assertThat(actual.get(i).getMovie(), samePropertyValuesAs(expected.get(i).getMovie()));
+    }
+
   }
 }

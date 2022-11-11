@@ -20,6 +20,7 @@ import org.movie.reviewer.domain.review.domain.Review;
 import org.movie.reviewer.domain.review_comment.domain.ReviewComment;
 import org.movie.reviewer.domain.review_comment.dto.ReviewCommentConverter;
 import org.movie.reviewer.domain.review_comment.dto.response.ReviewCommentResponse;
+import org.movie.reviewer.domain.review_comment.dto.response.UserCommentResponse;
 import org.movie.reviewer.domain.review_comment.repository.ReviewCommentRepository;
 import org.movie.reviewer.domain.user.domain.User;
 
@@ -32,6 +33,7 @@ class ReviewCommentServiceTest {
 
   @Mock
   private ReviewCommentRepository reviewCommentRepository;
+
   private Movie movie = Movie.builder()
       .id(0L)
       .country("KR")
@@ -105,12 +107,38 @@ class ReviewCommentServiceTest {
     assertThat(actual.size(), is(3));
     assertThat(actual.size(), is(expected.size()));
 
-    for(int i=0;i<actual.size();i++){
+    for (int i = 0; i < actual.size(); i++) {
       assertThat(actual.get(i).getId(), is(expected.get(i).getId()));
       assertThat(actual.get(i).getContents(), is(equalTo(expected.get(i).getContents())));
       assertThat(actual.get(i).getLikeCount(), is(expected.get(i).getLikeCount()));
       assertThat(actual.get(i).getUpdatedAt(), is(expected.get(i).getUpdatedAt()));
       assertThat(actual.get(i).getUser(), samePropertyValuesAs(expected.get(i).getUser()));
+    }
+
+  }
+
+  @Test
+  void getCommentsByUserId() {
+    //given
+    List<UserCommentResponse> expected = List.of(
+        ReviewCommentConverter.toUserCommentResponse(reviewComment1),
+        ReviewCommentConverter.toUserCommentResponse(reviewComment2),
+        ReviewCommentConverter.toUserCommentResponse(reviewComment3));
+
+    given(reviewCommentRepository.findCommentsByUserId(user.getId()))
+        .willReturn(List.of(reviewComment1, reviewComment2, reviewComment3));
+
+    //when
+    List<UserCommentResponse> actual = reviewCommentService.getCommentsByUserId(user.getId());
+
+    //then
+    then(reviewCommentService).should().getCommentsByUserId(user.getId());
+    then(reviewCommentRepository).should().findCommentsByUserId(user.getId());
+
+    assertThat(actual.size(), is(3));
+    assertThat(actual.size(), is(actual.size()));
+    for (int i = 0; i < actual.size(); i++) {
+      assertThat(actual.get(i), samePropertyValuesAs(expected.get(i)));
     }
 
   }

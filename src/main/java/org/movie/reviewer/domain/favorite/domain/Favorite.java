@@ -11,6 +11,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.movie.reviewer.domain.movie.domain.Movie;
@@ -19,6 +20,7 @@ import org.movie.reviewer.global.common.BaseEntity;
 
 @Entity
 @Getter
+@Builder
 @Table(name = "favorite")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

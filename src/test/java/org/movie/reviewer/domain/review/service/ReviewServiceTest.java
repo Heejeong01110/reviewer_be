@@ -26,6 +26,7 @@ import org.movie.reviewer.domain.review.dto.response.ReviewDetailResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewSimpleResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleInfo;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleResponse;
+import org.movie.reviewer.domain.review.dto.response.UserReviewResponse;
 import org.movie.reviewer.domain.review.repository.ReviewRepository;
 import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.dto.response.UserSimpleInfo;
@@ -235,6 +236,34 @@ class ReviewServiceTest {
       assertThat(actual.get(i).getTitle(), equalTo(expected.get(i).getTitle()));
       assertThat(actual.get(i).getContents(), equalTo(expected.get(i).getContents()));
       assertThat(actual.get(i).getUser(), samePropertyValuesAs(expected.get(i).getUser()));
+    }
+
+  }
+
+  @Test
+  void getReviewsByUserId() {
+    //given
+    List<UserReviewResponse> expected = List.of(
+        ReviewConverter.toUserReviewResponse(review1),
+        ReviewConverter.toUserReviewResponse(review2));
+
+    given(reviewRepository.findReviewsByUserId(user.getId())).willReturn(List.of(review1, review2));
+
+    //when
+    List<UserReviewResponse> actual = reviewService.getReviewsByUserId(user.getId());
+
+    //then
+    then(reviewService).should().getReviewsByUserId(user.getId());
+    then(reviewRepository).should().findReviewsByUserId(user.getId());
+
+    assertThat(actual.size(), is(2));
+    assertThat(actual.size(), is(actual.size()));
+    for (int i = 0; i < actual.size(); i++) {
+      assertThat(actual.get(i).getId(), is(expected.get(i).getId()));
+      assertThat(actual.get(i).getTitle(), is(expected.get(i).getTitle()));
+      assertThat(actual.get(i).getLikeCount(), is(expected.get(i).getLikeCount()));
+      assertThat(actual.get(i).getUpdatedAt(), is(expected.get(i).getUpdatedAt()));
+      assertThat(actual.get(i).getMovie(), samePropertyValuesAs(expected.get(i).getMovie()));
     }
 
   }

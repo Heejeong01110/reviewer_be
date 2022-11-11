@@ -7,14 +7,17 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
 @Table(name = "movie")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Movie {
 
   @Id
@@ -43,16 +46,4 @@ public class Movie {
   @Column(length = 20000)
   private String summary;
 
-  @Builder
-  public Movie(Long id, String title, String genre, String country, Long runningTime,
-      String movieImage, String director, String summary) {
-    this.id = id;
-    this.title = title;
-    this.genre = genre;
-    this.country = country;
-    this.runningTime = runningTime;
-    this.movieImage = movieImage;
-    this.director = director;
-    this.summary = summary;
-  }
 }
