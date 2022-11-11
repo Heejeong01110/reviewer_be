@@ -13,6 +13,10 @@ public interface ReviewCommentRepository extends JpaRepository<ReviewComment, Lo
   @Query("SELECT DISTINCT c FROM ReviewComment c "
       + "JOIN FETCH c.user "
       + "WHERE c.review.id = :id")
-  List<ReviewComment> findReviewCommentsByReviewId(@Param("id") Long reviewId);
+  List<ReviewComment> findCommentsByReviewId(@Param("id") Long reviewId);
 
+  @Query("SELECT DISTINCT c FROM ReviewComment c "
+      + "JOIN FETCH c.review "
+      + "WHERE c.user.id = :id")
+  List<ReviewComment> findCommentsByUserId(@Param("id") Long userId);
 }

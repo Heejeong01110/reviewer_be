@@ -3,6 +3,7 @@ package org.movie.reviewer.domain.rating.api;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.movie.reviewer.domain.rating.dto.response.RatingResponse;
+import org.movie.reviewer.domain.rating.dto.response.UserRatingResponse;
 import org.movie.reviewer.domain.rating.service.RatingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,12 @@ public class RatingApi {
   public ResponseEntity<List<RatingResponse>> getRatingsByMovieId(
       @PathVariable("movieId") Long movieId) {
     return ResponseEntity.ok(ratingService.getRatingsByMovieId(movieId));
+  }
+
+  @GetMapping("/account/{userId}/ratings")
+  public ResponseEntity<List<UserRatingResponse>> getReviewsByUserId(
+      @PathVariable("userId") Long userId) {
+    return ResponseEntity.ok(ratingService.getRatingsByUserId(userId));
   }
 
 }

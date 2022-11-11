@@ -12,7 +12,7 @@ import org.movie.reviewer.domain.movie.dto.response.MovieSimpleInfo;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserReviewInfo {
+public class UserReviewResponse {
 
   private Long id;
 

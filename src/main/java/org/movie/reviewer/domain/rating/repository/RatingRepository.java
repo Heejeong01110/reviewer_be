@@ -2,7 +2,6 @@ package org.movie.reviewer.domain.rating.repository;
 
 import java.util.List;
 import org.movie.reviewer.domain.rating.domain.Rating;
-import org.movie.reviewer.domain.rating.dto.response.UserRatingInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

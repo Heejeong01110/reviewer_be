@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.movie.reviewer.domain.rating.dto.response.UserRatingInfo;
-import org.movie.reviewer.domain.review.dto.response.UserReviewInfo;
+import org.movie.reviewer.domain.rating.dto.response.UserRatingResponse;
+import org.movie.reviewer.domain.review.dto.response.UserReviewResponse;
 
 @Getter
 @Builder
@@ -22,8 +22,8 @@ public class UserDetailResponse {
 
   private String profileImage;
 
-  private List<UserReviewInfo> reviews;
+  private List<UserReviewResponse> reviews;
 
-  private List<UserRatingInfo> ratings;
+  private List<UserRatingResponse> ratings;
 
 }

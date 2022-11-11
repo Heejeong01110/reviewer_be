@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.movie.reviewer.domain.review.dto.response.ReviewDetailResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewSimpleResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleResponse;
+import org.movie.reviewer.domain.review.dto.response.UserReviewResponse;
 import org.movie.reviewer.domain.review.service.ReviewService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +34,12 @@ public class reviewApi {
   public ResponseEntity<List<ReviewSimpleResponse>> getMovieReviews(
       @PathVariable("movieId") Long movieId) {
     return ResponseEntity.ok(reviewService.getSimpleReviewsByMovieId(movieId));
+  }
+
+  @GetMapping("/account/{userId}/reviews")
+  public ResponseEntity<List<UserReviewResponse>> getReviewsByUserId(
+      @PathVariable("userId") Long userId) {
+    return ResponseEntity.ok(reviewService.getReviewsByUserId(userId));
   }
 
 }

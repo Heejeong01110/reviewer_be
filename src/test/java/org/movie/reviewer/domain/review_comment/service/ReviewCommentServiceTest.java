@@ -91,7 +91,7 @@ class ReviewCommentServiceTest {
         ReviewCommentConverter.toReviewCommentResponse(reviewComment2),
         ReviewCommentConverter.toReviewCommentResponse(reviewComment3));
 
-    given(reviewCommentRepository.findReviewCommentsByReviewId(review.getId()))
+    given(reviewCommentRepository.findCommentsByReviewId(review.getId()))
         .willReturn(List.of(reviewComment1, reviewComment2, reviewComment3));
 
     //when
@@ -100,7 +100,7 @@ class ReviewCommentServiceTest {
 
     //then
     then(reviewCommentService).should().getReviewComments(review.getId());
-    then(reviewCommentRepository).should().findReviewCommentsByReviewId(review.getId());
+    then(reviewCommentRepository).should().findCommentsByReviewId(review.getId());
 
     assertThat(actual.size(), is(3));
     assertThat(actual.size(), is(expected.size()));
