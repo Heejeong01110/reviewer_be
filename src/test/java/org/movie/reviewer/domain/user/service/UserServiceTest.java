@@ -126,4 +126,34 @@ class UserServiceTest {
       assertThat(actual.getRatings().get(i), samePropertyValuesAs(expected.getRatings().get(i)));
     }
   }
+
+  @Test
+  void checkEmailDuplicate() {
+    //given
+    given(userRepository.existsByEmail(user.getEmail())).willReturn(true);
+
+    //when
+    boolean actual = userService.checkEmailDuplicate(user.getEmail());
+
+    //then
+    then(userService).should().checkEmailDuplicate(user.getEmail());
+    then(userRepository).should().existsByEmail(user.getEmail());
+
+    assertThat(actual, is(false));
+  }
+
+  @Test
+  void checkNicknameDuplicate() {
+    //given
+    given(userRepository.existsByNickname(user.getNickname())).willReturn(true);
+
+    //when
+    boolean actual = userService.checkNicknameDuplicate(user.getNickname());
+
+    //then
+    then(userService).should().checkNicknameDuplicate(user.getNickname());
+    then(userRepository).should().existsByNickname(user.getNickname());
+
+    assertThat(actual, is(false));
+  }
 }

@@ -35,4 +35,13 @@ public class UserService {
 
     return UserConverter.toUserDetailResponse(user, reviews, ratings);
   }
+
+  public boolean checkEmailDuplicate(String email) {
+    return !userRepository.existsByEmail(email);
+  }
+
+  public boolean checkNicknameDuplicate(String nickname) {
+    return !userRepository.existsByNickname(nickname);
+  }
+
 }
