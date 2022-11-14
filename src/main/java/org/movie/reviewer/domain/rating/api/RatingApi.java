@@ -24,7 +24,7 @@ public class RatingApi {
     return ResponseEntity.ok(ratingService.getRatingsByMovieId(movieId));
   }
 
-  @GetMapping("/account/{userId}/ratings")
+  @GetMapping("/accounts/{userId}/ratings")
   public ResponseEntity<List<UserRatingResponse>> getReviewsByUserId(
       @PathVariable("userId") Long userId) {
     return ResponseEntity.ok(ratingService.getRatingsByUserId(userId));

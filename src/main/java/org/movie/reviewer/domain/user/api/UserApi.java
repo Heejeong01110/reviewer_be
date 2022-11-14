@@ -16,7 +16,7 @@ public class UserApi {
 
   private final UserService userService;
 
-  @GetMapping("account/{userId}")
+  @GetMapping("accounts/{userId}")
   public ResponseEntity<UserDetailResponse> getUserById(@PathVariable("userId") Long userId) {
     return ResponseEntity.ok(userService.getUserById(userId));
   }

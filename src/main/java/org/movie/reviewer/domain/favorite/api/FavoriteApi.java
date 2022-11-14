@@ -17,7 +17,7 @@ public class FavoriteApi {
 
   private final FavoriteService favoriteService;
 
-  @GetMapping("/account/{userId}/favorites")
+  @GetMapping("/accounts/{userId}/favorites")
   public ResponseEntity<List<UserFavoriteResponse>> getReviewsByUserId(
       @PathVariable("userId") Long userId) {
     return ResponseEntity.ok(favoriteService.getFavoritesByUserId(userId));
