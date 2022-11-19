@@ -5,6 +5,7 @@ import org.movie.reviewer.domain.movie.domain.Actor;
 import org.movie.reviewer.domain.movie.domain.Movie;
 import org.movie.reviewer.domain.movie.dto.response.ActorInfo;
 import org.movie.reviewer.domain.movie.dto.response.MovieDetailResponse;
+import org.movie.reviewer.domain.movie.dto.response.MovieSimpleInfo;
 import org.movie.reviewer.domain.movie.dto.response.MovieTitleResponse;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +42,14 @@ public class MovieConverter {
         .id(actor.getId())
         .name(actor.getName())
         .role(actor.getRole())
+        .build();
+  }
+
+  public static MovieSimpleInfo toMovieSimpleInfo(Movie movie) {
+    return MovieSimpleInfo.builder()
+        .id(movie.getId())
+        .title(movie.getTitle())
+        .movieImage(movie.getMovieImage())
         .build();
   }
 
