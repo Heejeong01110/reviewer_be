@@ -19,12 +19,12 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
   Double getRatingAvgByMovieId(Long movieId);
 
   @Query("SELECT DISTINCT r FROM Rating r "
-      + "JOIN FETCH r.user "
+      + "LEFT JOIN FETCH r.user "
       + "WHERE r.movie.id = :id")
   List<Rating> getRatingsByMovieId(@Param("id") Long movieId);
 
   @Query("SELECT DISTINCT r FROM Rating r "
-      + "JOIN FETCH r.movie "
+      + "LEFT JOIN FETCH r.movie "
       + "WHERE r.user.id = :id")
   List<Rating> getRatingsByUserId(@Param("id") Long userId);
 

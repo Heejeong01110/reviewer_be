@@ -23,7 +23,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
   )
   List<ReviewTitleInfo> findReviewTitleAll();
 
-
   @Query("SELECT "
       + "new org.movie.reviewer.domain.review.dto.response.ReviewDetailInfo "
       + "(r.id, r.title, r.contents, r.updatedAt, "
@@ -39,7 +38,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
   List<Review> findReviewsByMovieId(Long movieId);
 
   @Query("SELECT DISTINCT r FROM Review r "
-      + "JOIN FETCH r.movie "
+      + "LEFT JOIN FETCH r.movie "
       + "WHERE r.user.id = :id")
   List<Review> findReviewsByUserId(@Param("id") Long userId);
 }
