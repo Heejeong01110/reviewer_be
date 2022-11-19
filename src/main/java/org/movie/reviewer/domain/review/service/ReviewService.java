@@ -37,8 +37,8 @@ public class ReviewService {
   }
 
   public List<ReviewSimpleResponse> getSimpleReviewsByMovieId(Long movieId) {
-    return ReviewConverter.toReviewSimpleResponse(
-        reviewRepository.findReviewsByMovieId(movieId));
+    return reviewRepository.findReviewsByMovieId(movieId)
+        .stream().map(ReviewConverter::toReviewSimpleResponse).toList();
   }
 
   public List<UserReviewResponse> getReviewsByUserId(Long userId) {

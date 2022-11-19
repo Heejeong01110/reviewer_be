@@ -63,21 +63,14 @@ public class ReviewConverter {
         .build();
   }
 
-  public static List<ReviewSimpleResponse> toReviewSimpleResponse(List<Review> reviews) {
-    return reviews.stream().map(review ->
-            ReviewSimpleResponse.builder()
-                .id(review.getId())
-                .title(review.getTitle())
-                .contents(review.getContents())
-                .updatedAt(review.getUpdatedAt())
-                .user(
-                    UserSimpleInfo.builder()
-                        .id(review.getUser().getId())
-                        .nickname(review.getUser().getNickname())
-                        .profileImage(review.getUser().getProfileImage())
-                        .build())
-                .build())
-        .toList();
+  public static ReviewSimpleResponse toReviewSimpleResponse(Review review) {
+    return ReviewSimpleResponse.builder()
+        .id(review.getId())
+        .title(review.getTitle())
+        .contents(review.getContents())
+        .updatedAt(review.getUpdatedAt())
+        .user(UserConverter.toUserSimpleInfo(review.getUser()))
+        .build();
   }
 
   public static UserReviewResponse toUserReviewResponse(Review review) {
