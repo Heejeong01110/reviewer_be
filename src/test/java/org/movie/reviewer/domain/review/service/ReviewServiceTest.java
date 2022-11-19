@@ -17,11 +17,11 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.movie.reviewer.domain.movie.domain.Movie;
+import org.movie.reviewer.domain.movie.dto.MovieConverter;
 import org.movie.reviewer.domain.movie.dto.response.MovieCardInfo;
 import org.movie.reviewer.domain.rating.service.RatingService;
 import org.movie.reviewer.domain.review.domain.Review;
 import org.movie.reviewer.domain.review.dto.ReviewConverter;
-import org.movie.reviewer.domain.review.dto.response.ReviewDetailInfo;
 import org.movie.reviewer.domain.review.dto.response.ReviewDetailResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewSimpleResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleInfo;
@@ -29,6 +29,7 @@ import org.movie.reviewer.domain.review.dto.response.ReviewTitleResponse;
 import org.movie.reviewer.domain.review.dto.response.UserReviewResponse;
 import org.movie.reviewer.domain.review.repository.ReviewRepository;
 import org.movie.reviewer.domain.user.domain.User;
+import org.movie.reviewer.domain.user.dto.UserConverter;
 import org.movie.reviewer.domain.user.dto.response.UserSimpleInfo;
 
 @ExtendWith(MockitoExtension.class)
@@ -138,40 +139,11 @@ class ReviewServiceTest {
   @Test
   void getReviewById() {
     //given
-    ReviewDetailInfo reviewDetailInfo = ReviewDetailInfo.builder()
-        .reviewId(review1.getId())
-        .reviewTitle(review1.getTitle())
-        .contents(review1.getContents())
-        .updatedAt(LocalDateTime.now())
-        .userId(review1.getUser().getId())
-        .nickname(review1.getUser().getNickname())
-        .profileImage(review1.getUser().getProfileImage())
-        .movieId(review1.getMovie().getId())
-        .movieTitle(review1.getMovie().getTitle())
-        .movieImage(review1.getMovie().getMovieImage())
-        .movieGenre(review1.getMovie().getGenre())
-        .country(review1.getMovie().getCountry())
-        .runningTime(review1.getMovie().getRunningTime())
-        .build();
-
-    MovieCardInfo movieCardInfo = MovieCardInfo.builder()
-        .id(reviewDetailInfo.getMovieId())
-        .title(reviewDetailInfo.getMovieTitle())
-        .movieImage(reviewDetailInfo.getMovieImage())
-        .genre(reviewDetailInfo.getMovieGenre())
-        .country(reviewDetailInfo.getCountry())
-        .runningTime(reviewDetailInfo.getRunningTime())
-        .rating(4.5)
-        .build();
-
-    UserSimpleInfo userSimpleInfo = UserSimpleInfo.builder()
-        .id(reviewDetailInfo.getUserId())
-        .nickname(reviewDetailInfo.getNickname())
-        .profileImage(reviewDetailInfo.getProfileImage())
-        .build();
+    MovieCardInfo movieCardInfo = MovieConverter.toMovieCardInfo(review1.getMovie(), 4.5);
+    UserSimpleInfo userSimpleInfo = UserConverter.toUserSimpleInfo(review1.getUser());
 
     given(reviewRepository.findReviewDetailById(review1.getId())).willReturn(
-        Optional.of(reviewDetailInfo));
+        Optional.of(review1));
     given(ratingService.getRatingScoreByMovieId(review1.getMovie().getId())).willReturn(
         movieCardInfo.getRating());
 
@@ -182,9 +154,9 @@ class ReviewServiceTest {
     then(reviewRepository).should().findReviewDetailById(review1.getId());
     then(ratingService).should().getRatingScoreByMovieId(review1.getMovie().getId());
 
-    assertThat(actual.getId(), is(reviewDetailInfo.getReviewId()));
-    assertThat(actual.getTitle(), equalTo(reviewDetailInfo.getReviewTitle()));
-    assertThat(actual.getContents(), equalTo(reviewDetailInfo.getContents()));
+    assertThat(actual.getId(), is(review1.getId()));
+    assertThat(actual.getTitle(), equalTo(review1.getTitle()));
+    assertThat(actual.getContents(), equalTo(review1.getContents()));
     assertThat(actual.getMovie(), samePropertyValuesAs(movieCardInfo));
     assertThat(actual.getUser(), samePropertyValuesAs(userSimpleInfo));
   }

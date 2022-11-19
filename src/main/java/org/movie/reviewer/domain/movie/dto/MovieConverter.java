@@ -4,6 +4,7 @@ import java.util.List;
 import org.movie.reviewer.domain.movie.domain.Actor;
 import org.movie.reviewer.domain.movie.domain.Movie;
 import org.movie.reviewer.domain.movie.dto.response.ActorInfo;
+import org.movie.reviewer.domain.movie.dto.response.MovieCardInfo;
 import org.movie.reviewer.domain.movie.dto.response.MovieDetailResponse;
 import org.movie.reviewer.domain.movie.dto.response.MovieSimpleInfo;
 import org.movie.reviewer.domain.movie.dto.response.MovieTitleResponse;
@@ -50,6 +51,18 @@ public class MovieConverter {
         .id(movie.getId())
         .title(movie.getTitle())
         .movieImage(movie.getMovieImage())
+        .build();
+  }
+
+  public static MovieCardInfo toMovieCardInfo(Movie movie, Double rating) {
+    return MovieCardInfo.builder()
+        .id(movie.getId())
+        .title(movie.getTitle())
+        .movieImage(movie.getMovieImage())
+        .genre(movie.getGenre())
+        .country(movie.getCountry())
+        .runningTime(movie.getRunningTime())
+        .rating(rating)
         .build();
   }
 

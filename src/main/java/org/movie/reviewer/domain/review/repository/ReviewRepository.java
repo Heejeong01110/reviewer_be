@@ -3,7 +3,6 @@ package org.movie.reviewer.domain.review.repository;
 import java.util.List;
 import java.util.Optional;
 import org.movie.reviewer.domain.review.domain.Review;
-import org.movie.reviewer.domain.review.dto.response.ReviewDetailInfo;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,17 +22,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
   )
   List<ReviewTitleInfo> findReviewTitleAll();
 
-  @Query("SELECT "
-      + "new org.movie.reviewer.domain.review.dto.response.ReviewDetailInfo "
-      + "(r.id, r.title, r.contents, r.updatedAt, "
-      + "u.id, u.nickname, u.profileImage, m.id, "
-      + "m.title, m.movieImage, m.genre, m.country, m.runningTime) "
-      + "FROM Review r "
-      + "LEFT JOIN User u ON u.id = r.user.id "
-      + "LEFT JOIN Movie m ON m.id = r.movie.id "
+  @Query("SELECT DISTINCT r FROM Review r "
+      + "LEFT JOIN FETCH r.user "
+      + "LEFT JOIN FETCH r.movie "
       + "WHERE r.id = :id"
   )
-  Optional<ReviewDetailInfo> findReviewDetailById(@Param("id") Long reviewId);
+  Optional<Review> findReviewDetailById(@Param("id") Long reviewId);
 
   List<Review> findReviewsByMovieId(Long movieId);
 

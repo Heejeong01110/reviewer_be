@@ -1,11 +1,8 @@
 package org.movie.reviewer.domain.review.dto;
 
-import java.util.List;
 import org.movie.reviewer.domain.movie.dto.MovieConverter;
-import org.movie.reviewer.domain.movie.dto.response.MovieCardInfo;
 import org.movie.reviewer.domain.movie.dto.response.MovieSimpleInfo;
 import org.movie.reviewer.domain.review.domain.Review;
-import org.movie.reviewer.domain.review.dto.response.ReviewDetailInfo;
 import org.movie.reviewer.domain.review.dto.response.ReviewDetailResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewSimpleResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleInfo;
@@ -38,28 +35,14 @@ public class ReviewConverter {
         .build();
   }
 
-  public static ReviewDetailResponse toReviewDetailResponse(ReviewDetailInfo info, Double rating) {
+  public static ReviewDetailResponse toReviewDetailResponse(Review review, Double rating) {
     return ReviewDetailResponse.builder()
-        .id(info.getReviewId())
-        .title(info.getReviewTitle())
-        .contents(info.getContents())
-        .updatedAt(info.getUpdatedAt())
-        .user(
-            UserSimpleInfo.builder()
-                .id(info.getUserId())
-                .nickname(info.getNickname())
-                .profileImage(info.getProfileImage())
-                .build())
-        .movie(
-            MovieCardInfo.builder()
-                .id(info.getMovieId())
-                .title(info.getMovieTitle())
-                .movieImage(info.getMovieImage())
-                .genre(info.getMovieGenre())
-                .country(info.getCountry())
-                .runningTime(info.getRunningTime())
-                .rating(rating)
-                .build())
+        .id(review.getId())
+        .title(review.getTitle())
+        .contents(review.getContents())
+        .updatedAt(review.getUpdatedAt())
+        .user(UserConverter.toUserSimpleInfo(review.getUser()))
+        .movie(MovieConverter.toMovieCardInfo(review.getMovie(), rating))
         .build();
   }
 
