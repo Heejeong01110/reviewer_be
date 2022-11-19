@@ -1,6 +1,7 @@
 package org.movie.reviewer.domain.movie.dto;
 
 import java.util.List;
+import org.movie.reviewer.domain.movie.domain.Actor;
 import org.movie.reviewer.domain.movie.domain.Movie;
 import org.movie.reviewer.domain.movie.dto.response.ActorInfo;
 import org.movie.reviewer.domain.movie.dto.response.MovieDetailResponse;
@@ -34,4 +35,13 @@ public class MovieConverter {
         .rating(rating)
         .build();
   }
+
+  public static ActorInfo toActorInfo(Actor actor) {
+    return ActorInfo.builder()
+        .id(actor.getId())
+        .name(actor.getName())
+        .role(actor.getRole())
+        .build();
+  }
+
 }

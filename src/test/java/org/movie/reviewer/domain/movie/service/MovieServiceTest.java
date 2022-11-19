@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.movie.reviewer.domain.movie.domain.Actor;
 import org.movie.reviewer.domain.movie.domain.Movie;
 import org.movie.reviewer.domain.movie.dto.MovieConverter;
 import org.movie.reviewer.domain.movie.dto.response.ActorInfo;
@@ -61,7 +62,16 @@ class MovieServiceTest {
       .summary("두려움은 너를 죄수로 가두고 희망은 너를 자유롭게 하리라")
       .build();
 
-  private List<ActorInfo> actors = List.of(
+
+  private List<Actor> actors = List.of(
+      Actor.builder().id(0L).name("조승우").role("고니").build(),
+      Actor.builder().id(1L).name("김혜수").role("정마담").build(),
+      Actor.builder().id(2L).name("백윤식").role("평강장").build(),
+      Actor.builder().id(3L).name("유해진").role("고광렬").build(),
+      Actor.builder().id(4L).name("김응수").role("곽철용").build()
+  );
+
+  private List<ActorInfo> actorInfos = List.of(
       ActorInfo.builder().id(0L).name("조승우").role("고니").build(),
       ActorInfo.builder().id(1L).name("김혜수").role("정마담").build(),
       ActorInfo.builder().id(2L).name("백윤식").role("평강장").build(),
@@ -80,7 +90,7 @@ class MovieServiceTest {
       .runningTime(139L)
       .summary("인생을 건 한판 승부 | 큰거 한판에 인생은 예술이 된다! | 목숨을 걸 수 없다면, 배팅하지 마라! | 꽃들의 전쟁")
       .rating(3.0)
-      .actors(actors)
+      .actors(actorInfos)
       .build();
 
   private MovieTitleResponse movieTitleResponse1 = MovieConverter.toMovieTitleResponse(movie1, 5.0);

@@ -26,7 +26,8 @@ public class MovieService {
     return MovieConverter.toMovieDetailResponse(
         movieRepository.findMovieDetailById(movieId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.MOVIE_NOT_FOUNDED, movieId)),
-        movieRepository.findActorsByMovieId(movieId));
+        movieRepository.findActorsByMovieId(movieId)
+            .stream().map(MovieConverter::toActorInfo).toList());
   }
 
 }

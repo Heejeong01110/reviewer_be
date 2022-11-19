@@ -27,4 +27,5 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
       + "JOIN FETCH r.movie "
       + "WHERE r.user.id = :id")
   List<Rating> getRatingsByUserId(@Param("id") Long userId);
+
 }

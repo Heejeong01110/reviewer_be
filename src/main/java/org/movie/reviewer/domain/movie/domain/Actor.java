@@ -11,11 +11,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
 @Table(name = "actor")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

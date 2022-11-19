@@ -2,8 +2,8 @@ package org.movie.reviewer.domain.movie.repository;
 
 import java.util.List;
 import java.util.Optional;
+import org.movie.reviewer.domain.movie.domain.Actor;
 import org.movie.reviewer.domain.movie.domain.Movie;
-import org.movie.reviewer.domain.movie.dto.response.ActorInfo;
 import org.movie.reviewer.domain.movie.dto.response.MovieDetailResponse;
 import org.movie.reviewer.domain.movie.dto.response.MovieTitleResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,11 +31,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
   List<MovieTitleResponse> findMovieTitleAll();
 
 
-  @Query("SELECT "
-      + "new org.movie.reviewer.domain.movie.dto.response.ActorInfo "
-      + "(a.id, a.name, a.role) FROM Actor a "
-      + "WHERE a.movie.id = :id "
-  )
-  List<ActorInfo> findActorsByMovieId(@Param("id") Long movieId);
+  @Query("SELECT a FROM Actor a WHERE a.movie.id = :id")
+  List<Actor> findActorsByMovieId(@Param("id") Long movieId);
 
 }
