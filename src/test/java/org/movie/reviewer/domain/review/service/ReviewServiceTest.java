@@ -29,6 +29,7 @@ import org.movie.reviewer.domain.review.dto.response.ReviewTitleResponse;
 import org.movie.reviewer.domain.review.dto.response.UserReviewResponse;
 import org.movie.reviewer.domain.review.repository.ReviewRepository;
 import org.movie.reviewer.domain.user.domain.User;
+import org.movie.reviewer.domain.user.domain.UserRole;
 import org.movie.reviewer.domain.user.dto.UserConverter;
 import org.movie.reviewer.domain.user.dto.response.UserSimpleInfo;
 
@@ -64,6 +65,7 @@ class ReviewServiceTest {
       .password("test1234")
       .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
       .profileImage(null)
+      .role(UserRole.ROLE_MEMBER)
       .build();
 
   private Review review1 = Review.builder()

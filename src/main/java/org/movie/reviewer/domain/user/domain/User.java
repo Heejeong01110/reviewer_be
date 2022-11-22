@@ -2,11 +2,14 @@ package org.movie.reviewer.domain.user.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,8 +17,10 @@ import org.movie.reviewer.global.common.BaseEntity;
 
 @Entity
 @Getter
+@Builder
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class User extends BaseEntity {
 
   @Id
@@ -38,14 +43,8 @@ public class User extends BaseEntity {
   @Column(length = 200)
   private String profileImage;
 
-  @Builder
-  public User(Long id, String email, String password, String nickname, String introduction,
-      String profileImage) {
-    this.id = id;
-    this.email = email;
-    this.password = password;
-    this.nickname = nickname;
-    this.introduction = introduction;
-    this.profileImage = profileImage;
-  }
+  @Column(nullable = false)
+  @Enumerated(value = EnumType.STRING)
+  private UserRole role;
+
 }

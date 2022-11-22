@@ -21,6 +21,7 @@ import org.movie.reviewer.domain.rating.dto.response.RatingResponse;
 import org.movie.reviewer.domain.rating.dto.response.UserRatingResponse;
 import org.movie.reviewer.domain.rating.repository.RatingRepository;
 import org.movie.reviewer.domain.user.domain.User;
+import org.movie.reviewer.domain.user.domain.UserRole;
 
 @ExtendWith(MockitoExtension.class)
 class RatingServiceTest {
@@ -51,6 +52,7 @@ class RatingServiceTest {
       .password("test1234")
       .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
       .profileImage(null)
+      .role(UserRole.ROLE_MEMBER)
       .build();
 
   private Rating rating1 = Rating.builder()

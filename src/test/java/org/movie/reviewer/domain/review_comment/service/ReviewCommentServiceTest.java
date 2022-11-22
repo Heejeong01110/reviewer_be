@@ -23,6 +23,7 @@ import org.movie.reviewer.domain.review_comment.dto.response.ReviewCommentRespon
 import org.movie.reviewer.domain.review_comment.dto.response.UserCommentResponse;
 import org.movie.reviewer.domain.review_comment.repository.ReviewCommentRepository;
 import org.movie.reviewer.domain.user.domain.User;
+import org.movie.reviewer.domain.user.domain.UserRole;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewCommentServiceTest {
@@ -53,6 +54,7 @@ class ReviewCommentServiceTest {
       .password("test1234")
       .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
       .profileImage(null)
+      .role(UserRole.ROLE_MEMBER)
       .build();
 
   private Review review = Review.builder()
