@@ -30,3 +30,8 @@ spring:
       data-locations: classpath:data/dummyData.sql
       mode: always
       platform: h2
+jwt:
+  secret: validSecretKey
+  expire-min: 10
+  refresh-secret: refreshSecretKey
+  refresh-expire-min: 30

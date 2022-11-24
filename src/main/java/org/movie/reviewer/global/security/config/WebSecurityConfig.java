@@ -49,7 +49,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .apply(new JwtSecurityConfig(authenticationManagerBuilder.getOrBuild()))
     .and()
         .authorizeRequests()
-        .antMatchers("/accounts/**").hasAnyRole(ROLE_ADMIN, ROLE_NORMAL)
         .anyRequest().permitAll();
 
   }
