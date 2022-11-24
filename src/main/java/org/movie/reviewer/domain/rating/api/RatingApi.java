@@ -18,13 +18,13 @@ public class RatingApi {
 
   private final RatingService ratingService;
 
-  @GetMapping("/movies/{movieId}/ratings")
+  @GetMapping("movies/{movieId}/ratings")
   public ResponseEntity<List<RatingResponse>> getRatingsByMovieId(
       @PathVariable("movieId") Long movieId) {
     return ResponseEntity.ok(ratingService.getRatingsByMovieId(movieId));
   }
 
-  @GetMapping("/accounts/{userId}/ratings")
+  @GetMapping("accounts/{userId}/ratings")
   public ResponseEntity<List<UserRatingResponse>> getReviewsByUserId(
       @PathVariable("userId") Long userId) {
     return ResponseEntity.ok(ratingService.getRatingsByUserId(userId));

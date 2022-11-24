@@ -25,25 +25,22 @@ public class UserApi {
     return ResponseEntity.ok(userService.getUserById(userId));
   }
 
-  @GetMapping("/validity_checks/email/{email}")
+  @GetMapping("validity_checks/email/{email}")
   public ResponseEntity<String> checkEmailDuplicate(@PathVariable("email") String email) {
     if (userService.checkEmailDuplicate(email)) {
       return ResponseEntity.ok().build();
     }
 
-    return ResponseEntity.status(HttpStatus.CONFLICT)
-        .body(DUPLICATE_EMAIL_ARGUMENT);
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(DUPLICATE_EMAIL_ARGUMENT);
   }
 
-  @GetMapping("/validity_checks/nickname/{nickname}")
-  public ResponseEntity<String> checkNicknameDuplicate(
-      @PathVariable("nickname") String nickname) {
+  @GetMapping("validity_checks/nickname/{nickname}")
+  public ResponseEntity<String> checkNicknameDuplicate(@PathVariable("nickname") String nickname) {
     if (userService.checkNicknameDuplicate(nickname)) {
       return ResponseEntity.ok().build();
     }
-    
-    return ResponseEntity.status(HttpStatus.CONFLICT)
-        .body(DUPLICATE_NICKNAME_ARGUMENT);
+
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(DUPLICATE_NICKNAME_ARGUMENT);
   }
 
 }
