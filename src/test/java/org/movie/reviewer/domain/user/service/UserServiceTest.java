@@ -65,7 +65,7 @@ class UserServiceTest {
       .password("test1234")
       .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
       .profileImage(null)
-      .role(UserRole.ROLE_MEMBER)
+      .authority(UserRole.ROLE_MEMBER)
       .build();
 
   private Review review = Review.builder()

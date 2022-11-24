@@ -45,6 +45,6 @@ public class User extends BaseEntity {
 
   @Column(nullable = false)
   @Enumerated(value = EnumType.STRING)
-  private UserRole role;
+  private UserRole authority;
 
 }

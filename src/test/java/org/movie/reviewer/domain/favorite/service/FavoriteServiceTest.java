@@ -18,8 +18,6 @@ import org.movie.reviewer.domain.favorite.dto.FavoriteConverter;
 import org.movie.reviewer.domain.favorite.dto.response.UserFavoriteResponse;
 import org.movie.reviewer.domain.favorite.repository.FavoriteRepository;
 import org.movie.reviewer.domain.movie.domain.Movie;
-import org.movie.reviewer.domain.review.dto.ReviewConverter;
-import org.movie.reviewer.domain.review.dto.response.UserReviewResponse;
 import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.domain.UserRole;
 
@@ -65,7 +63,7 @@ class FavoriteServiceTest {
       .password("test1234")
       .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
       .profileImage(null)
-      .role(UserRole.ROLE_MEMBER)
+      .authority(UserRole.ROLE_MEMBER)
       .build();
 
   private Favorite favorite1 = Favorite.builder()
