@@ -35,3 +35,6 @@ jwt:
   expire-min: 10
   refresh-secret: refreshSecretKey
   refresh-expire-min: 30
+logging:
+  level:
+    root: info

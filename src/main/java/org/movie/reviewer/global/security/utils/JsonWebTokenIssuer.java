@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Date;
 import org.movie.reviewer.global.security.exception.JwtInvalidException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -51,14 +52,28 @@ public class JsonWebTokenIssuer {
     return createToken(email, authority, secretKeyBytes, expireMin);
   }
 
+
+  public String createAccessToken(Authentication authentication) {
+    String authorities = authentication.getAuthorities().stream().toList().get(0).toString();
+    return createToken((String) authentication.getPrincipal(), authorities,
+        secretKeyBytes, expireMin);
+  }
+
   public String createRefreshToken(String email, String authority) {
     return createToken(email, authority, refreshSecretKeyBytes, refreshExpireMin);
+  }
+
+  public String createRefreshToken(Authentication authentication) {
+    String authorities = authentication.getAuthorities().stream().toList().get(0).toString();
+    return createToken((String) authentication.getPrincipal(), authorities,
+        refreshSecretKeyBytes, refreshExpireMin);
   }
 
   public Claims parseClaimsFromRefreshToken(String jsonWebToken) {
     Claims claims;
     try {
-      claims = Jwts.parser().setSigningKey(refreshSecretKeyBytes).parseClaimsJws(jsonWebToken).getBody();
+      claims = Jwts.parser().setSigningKey(refreshSecretKeyBytes).parseClaimsJws(jsonWebToken)
+          .getBody();
     } catch (SignatureException signatureException) {
       throw new JwtInvalidException("signature key is different", signatureException);
     } catch (ExpiredJwtException expiredJwtException) {

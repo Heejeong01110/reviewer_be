@@ -1,9 +1,11 @@
 package org.movie.reviewer.domain.user.dto;
 
 import java.util.List;
+import org.movie.reviewer.domain.auth.domain.PrincipalDetails;
 import org.movie.reviewer.domain.rating.dto.response.UserRatingResponse;
 import org.movie.reviewer.domain.review.dto.response.UserReviewResponse;
 import org.movie.reviewer.domain.user.domain.User;
+import org.movie.reviewer.domain.user.dto.request.SignUpRequest;
 import org.movie.reviewer.domain.user.dto.response.UserDetailResponse;
 import org.movie.reviewer.domain.user.dto.response.UserSimpleInfo;
 import org.springframework.stereotype.Component;
@@ -31,4 +33,15 @@ public class UserConverter {
         .build();
   }
 
+  public static User toUser(SignUpRequest request) {
+    return User.builder()
+        .email(request.getEmail())
+        .password(request.getPassword())
+        .nickname(request.getNickname())
+        .build();
+  }
+
+  public static PrincipalDetails toUserDetails(User user) {
+    return new PrincipalDetails(user);
+  }
 }
