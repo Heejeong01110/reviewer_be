@@ -1,14 +1,11 @@
 package org.movie.reviewer.global.security.filter;
 
-import io.jsonwebtoken.Claims;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.movie.reviewer.domain.auth.service.PrincipalDetailsService;
-import org.movie.reviewer.global.security.tokens.JsonPrincipalAuthenticationToken;
 import org.movie.reviewer.global.security.utils.JsonWebTokenIssuer;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -23,8 +20,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
   public static final String AUTHORIZATION_HEADER = "Authorization";
   public static final String BEARER_PREFIX = "Bearer ";
-
-  private final PrincipalDetailsService principalDetailsService;
   private final JsonWebTokenIssuer jwtIssuer;
 
   //todo 의존성 확인하기
@@ -34,19 +29,24 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
 
-    String jwt = resolveToken(request);
-
-    if (StringUtils.hasText(jwt)) {
       try {
-        Claims claims = jwtIssuer.parseClaimsFromRefreshToken(jwt);
-        Authentication jwtAuthenticationToken = new JsonPrincipalAuthenticationToken(jwt);
-        Authentication authentication = authenticationManager.authenticate(jwtAuthenticationToken);
+        String jwt = resolveToken(request);
+        if (StringUtils.hasText(jwt) && jwtIssuer.validToken(jwt)) {
+          Authentication token = jwtIssuer.getAuthentication(jwt);
+          Authentication authentication = authenticationManager.authenticate(token);
+          SecurityContextHolder.getContext().setAuthentication(authentication);
+        } else {
+          if (!StringUtils.hasText(jwt)) {
+            request.setAttribute("unAuthorization", "401 인증키 없음");
+          }
+          if (jwtIssuer.validToken(jwt)) {
+            request.setAttribute("UnAuthorization", "401-001 인증키 만료");
+          }
+        }
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
       } catch (AuthenticationException authenticationException) {
         SecurityContextHolder.clearContext();
       }
-    }
 
     filterChain.doFilter(request, response);
   }

@@ -8,15 +8,8 @@ import org.springframework.security.core.SpringSecurityCoreVersion;
 public class JsonPrincipalAuthenticationToken extends AbstractAuthenticationToken {
 
   private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
-  private String jsonWebToken;
   private Object principal; //id
   private Object credentials; //pw
-
-  public JsonPrincipalAuthenticationToken(String jsonWebToken) {
-    super(null);
-    this.jsonWebToken = jsonWebToken;
-    this.setAuthenticated(false);
-  }
 
   public JsonPrincipalAuthenticationToken(Object principal, Object credentials) {
     super(null);
@@ -43,7 +36,4 @@ public class JsonPrincipalAuthenticationToken extends AbstractAuthenticationToke
     return principal;
   }
 
-  public String getJsonWebToken() {
-    return jsonWebToken;
-  }
 }
