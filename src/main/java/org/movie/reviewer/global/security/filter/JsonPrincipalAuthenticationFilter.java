@@ -12,8 +12,10 @@ import org.movie.reviewer.global.security.tokens.JsonPrincipalAuthenticationToke
 import org.movie.reviewer.global.security.utils.JsonWebTokenIssuer;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
@@ -25,11 +27,15 @@ public class JsonPrincipalAuthenticationFilter extends AbstractAuthenticationPro
   private final String HEADER_STRING = "Authorization";
   private final JsonWebTokenIssuer jwtIssuer;
 
+  private final PasswordEncoder passwordEncoder;
+
   public JsonPrincipalAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher,
       AuthenticationManager authenticationManager,
-      JsonWebTokenIssuer jwtIssuer) {
+      JsonWebTokenIssuer jwtIssuer,
+      PasswordEncoder passwordEncoder) {
     super(requiresAuthenticationRequestMatcher, authenticationManager);
     this.jwtIssuer = jwtIssuer;
+    this.passwordEncoder = passwordEncoder;
   }
 
   @Override
@@ -45,6 +51,7 @@ public class JsonPrincipalAuthenticationFilter extends AbstractAuthenticationPro
     LoginRequest loginRequest = null;
     try {
       loginRequest = om.readValue(request.getInputStream(), LoginRequest.class);
+
     } catch (Exception e) {
       log.error(e.getMessage());
       throw new AuthenticationServiceException(e.getMessage());
@@ -54,13 +61,14 @@ public class JsonPrincipalAuthenticationFilter extends AbstractAuthenticationPro
     //detailsService가 호출됨(loadUserByUsername())
     JsonPrincipalAuthenticationToken token =
         new JsonPrincipalAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
-    //HttpSerlvetRequest의 Holder로 감싸서 Token에도 request에 대한 정보를 가지고 있도록 저장하는 부분이다.
     token.setDetails(super.authenticationDetailsSource.buildDetails(request));
 
+    //UserDetailsService 확인
     Authentication authenticate = super.getAuthenticationManager().authenticate(token);
+    if (!this.passwordEncoder.matches(loginRequest.getPassword(), authenticate.getCredentials().toString())) {
+      throw new BadCredentialsException("AbstractUserDetailsAuthenticationProvider.badCredentials");
+    }
 
-    log.debug("test authentication email : " + authenticate.getPrincipal());
-    log.debug("test authentication password : " + authenticate.getCredentials());
     return authenticate;
   }
 
