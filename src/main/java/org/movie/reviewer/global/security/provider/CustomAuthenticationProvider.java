@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class JsonPrincipalAuthenticationProvider implements AuthenticationProvider {
+public class CustomAuthenticationProvider implements AuthenticationProvider {
 
   private final PrincipalDetailsService userDetailsService;
 

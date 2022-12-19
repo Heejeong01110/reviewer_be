@@ -1,12 +1,14 @@
 package org.movie.reviewer.global.security.filter;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.movie.reviewer.global.security.utils.JsonWebTokenIssuer;
+import org.movie.reviewer.global.security.exception.JwtInvalidException;
+import org.movie.reviewer.global.security.provider.JwtProvider;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -14,47 +16,49 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-//인가
+//인가(?) --> 기본적으로 인가 기능이 필요할 때 거치고, 인증일 때도 토큰 검증을 위해서 거침.
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-  public static final String AUTHORIZATION_HEADER = "Authorization";
-  public static final String BEARER_PREFIX = "Bearer ";
-  private final JsonWebTokenIssuer jwtIssuer;
+  public static final String HEADER_PREFIX = "Authorization";
+  public static final String TOKEN_PREFIX = "Bearer ";
 
-  //todo 의존성 확인하기
+  private final JwtProvider jwtProvider;
   private final AuthenticationManager authenticationManager;
 
+
+  // 헤더에 현재 accept Token에 대한 유효, 만료, 무효 여부를 담아줘야 함
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
 
-      try {
-        String jwt = resolveToken(request);
-        if (StringUtils.hasText(jwt) && jwtIssuer.validToken(jwt)) {
-          Authentication token = jwtIssuer.getAuthentication(jwt);
-          Authentication authentication = authenticationManager.authenticate(token);
-          SecurityContextHolder.getContext().setAuthentication(authentication);
-        } else {
-          if (!StringUtils.hasText(jwt)) {
-            request.setAttribute("unAuthorization", "401 인증키 없음");
-          }
-          if (jwtIssuer.validToken(jwt)) {
-            request.setAttribute("UnAuthorization", "401-001 인증키 만료");
-          }
-        }
-
-      } catch (AuthenticationException authenticationException) {
-        SecurityContextHolder.clearContext();
+    try {
+      String jwt = resolveToken(request, HEADER_PREFIX);
+      if (StringUtils.hasText(jwt) && jwtProvider.validAccessToken(jwt)) {
+        Authentication token = jwtProvider.getAuthentication(jwt);
+        Authentication authentication = authenticationManager.authenticate(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        response.addHeader("AUTH_VALID", "VALID");
       }
+
+    } catch (ExpiredJwtException exception) { //만료
+      response.addHeader("AUTH_VALID", "EXPIRED");
+
+      SecurityContextHolder.clearContext();
+    } catch (JwtInvalidException exception) { //무효
+      response.addHeader("AUTH_VALID", "INVALID");
+
+      SecurityContextHolder.clearContext();
+    } catch (AuthenticationException authenticationException) {
+      SecurityContextHolder.clearContext();
+    }
 
     filterChain.doFilter(request, response);
   }
 
-
-  private String resolveToken(HttpServletRequest request) {
-    String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-    if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+  private String resolveToken(HttpServletRequest request, String header) {
+    String bearerToken = request.getHeader(header);
+    if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(TOKEN_PREFIX)) {
       return bearerToken.substring(7);
     }
     return null;

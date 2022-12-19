@@ -1,13 +1,14 @@
 package org.movie.reviewer.global.security.config;
 
 import org.movie.reviewer.domain.auth.service.PrincipalDetailsService;
-import org.movie.reviewer.global.security.filter.JsonPrincipalAuthenticationFilter;
+import org.movie.reviewer.global.security.filter.CustomAuthenticationFilter;
 import org.movie.reviewer.global.security.filter.JwtAuthorizationFilter;
 import org.movie.reviewer.global.security.handler.CustomAccessDeniedHandler;
-import org.movie.reviewer.global.security.handler.CustomAuthenticationEntryPoint;
-import org.movie.reviewer.global.security.handler.JwtSuccessHandler;
-import org.movie.reviewer.global.security.provider.JsonPrincipalAuthenticationProvider;
-import org.movie.reviewer.global.security.utils.JsonWebTokenIssuer;
+import org.movie.reviewer.global.security.handler.JwtAuthenticationFailHandler;
+import org.movie.reviewer.global.security.handler.JwtAuthenticationSuccessHandler;
+import org.movie.reviewer.global.security.provider.CustomAuthenticationProvider;
+import org.movie.reviewer.global.security.provider.JwtProvider;
+import org.movie.reviewer.global.security.provider.RedisTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -19,6 +20,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -31,19 +34,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
       "/api/v1/login", "POST");
   private final String ROLE_ADMIN = "ADMIN";
   private final String ROLE_NORMAL = "NORMAL";
-  private final CustomAuthenticationEntryPoint authenticationEntryPoint;
-  private final CustomAccessDeniedHandler accessDeniedHandler;
-  private final JsonWebTokenIssuer jwtIssuer;
+  private final JwtProvider jwtProvider;
+  private final RedisTokenProvider redisTokenProvider;
   private final PrincipalDetailsService userDetailsService;
 
+
   public WebSecurityConfig(
-      CustomAuthenticationEntryPoint authenticationEntryPoint,
-      CustomAccessDeniedHandler accessDeniedHandler,
-      JsonWebTokenIssuer jwtIssuer,
+      JwtProvider jwtProvider,
+      RedisTokenProvider redisTokenProvider,
       PrincipalDetailsService userDetailsService) {
-    this.authenticationEntryPoint = authenticationEntryPoint;
-    this.accessDeniedHandler = accessDeniedHandler;
-    this.jwtIssuer = jwtIssuer;
+    this.jwtProvider = jwtProvider;
+    this.redisTokenProvider = redisTokenProvider;
     this.userDetailsService = userDetailsService;
   }
 
@@ -59,10 +60,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     // 인증 필터 -> AbstractAuthenticationProcessingFilter 구현체
-    JsonPrincipalAuthenticationFilter jsonPrincipalAuthenticationFilter = new JsonPrincipalAuthenticationFilter(
-        LOGIN_REQUEST_MATCHER, authenticationManagerBean(), jwtIssuer, passwordEncoder());
-    jsonPrincipalAuthenticationFilter
+    CustomAuthenticationFilter customAuthenticationFilter =
+        new CustomAuthenticationFilter(
+            LOGIN_REQUEST_MATCHER,
+            authenticationManagerBean(),
+            jwtProvider,
+            passwordEncoder(),
+            redisTokenProvider);
+    customAuthenticationFilter
         .setAuthenticationSuccessHandler(authenticationSuccessHandler());
+    customAuthenticationFilter
+        .setAuthenticationFailureHandler(authenticationFailureHandler());
 
     http
         .httpBasic().disable() // rest api 이므로 기본설정 사용안함. 기본설정은 비인증시 로그인폼 화면으로 리다이렉트 된다.
@@ -75,12 +83,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .exceptionHandling() //에러 핸들러 설정
-        .authenticationEntryPoint(authenticationEntryPoint)
-        .accessDeniedHandler(accessDeniedHandler)
+//        .authenticationEntryPoint(authenticationEntryPoint())
+        .accessDeniedHandler(accessDeniedHandler())
         .and()
         // 인증 필터 -> AbstractAuthenticationProcessingFilter 구현체
-        //addFilterAt() 지정된 필터 순서에 커스텀 필터 추가. 지정된 필터보다 커스텀 필터가 먼저 실행됨
-        .addFilterAt(jsonPrincipalAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterAt(customAuthenticationFilter,
+            UsernamePasswordAuthenticationFilter.class) //지정된 필터 순서에 커스텀 필터 추가. 지정된 필터보다 커스텀 필터가 먼저 실행됨
         .authorizeRequests()
 //        .antMatchers("/accounts/**").hasAnyRole(ROLE_ADMIN, ROLE_NORMAL)
         .anyRequest().permitAll();
@@ -96,7 +104,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Bean //인가 필터 -> OncePerRequestFilter 구현체
   public JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception {
-    return new JwtAuthorizationFilter(jwtIssuer, authenticationManager());
+    return new JwtAuthorizationFilter(jwtProvider, authenticationManager());
   }
 
   @Bean
@@ -106,7 +114,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Bean
   public AuthenticationProvider authenticationProvider() {
-    return new JsonPrincipalAuthenticationProvider(userDetailsService, passwordEncoder());
+    return new CustomAuthenticationProvider(userDetailsService);
   }
 
   @Bean
@@ -116,7 +124,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Bean
   public AuthenticationSuccessHandler authenticationSuccessHandler() {
-    return new JwtSuccessHandler(jwtIssuer);
+    return new JwtAuthenticationSuccessHandler();
+  }
+
+  @Bean
+  public AuthenticationFailureHandler authenticationFailureHandler() {
+    return new JwtAuthenticationFailHandler();
+  }
+
+//  @Bean
+//  public AuthenticationEntryPoint authenticationEntryPoint() {
+//    return new CustomAuthenticationEntryPoint();
+//  }
+
+  @Bean
+  public AccessDeniedHandler accessDeniedHandler() {
+    return new CustomAccessDeniedHandler();
   }
 
 }

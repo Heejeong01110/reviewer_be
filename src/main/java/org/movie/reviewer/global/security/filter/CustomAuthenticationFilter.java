@@ -7,9 +7,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
 import org.movie.reviewer.domain.user.dto.request.LoginRequest;
+import org.movie.reviewer.global.security.provider.JwtProvider;
+import org.movie.reviewer.global.security.provider.RedisTokenProvider;
 import org.movie.reviewer.global.security.tokens.JsonPrincipalAuthenticationToken;
-import org.movie.reviewer.global.security.utils.JsonWebTokenIssuer;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,21 +23,25 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 //인증
 @Slf4j
-public class JsonPrincipalAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+public class CustomAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-  private final String GRANT_TYPE_BEARER = "Bearer ";
-  private final String HEADER_STRING = "Authorization";
-  private final JsonWebTokenIssuer jwtIssuer;
+  private static final String TOKEN_PREFIX = "Bearer ";
+  private static final String HEADER_PREFIX = "Authorization";
+  private static final String REFRESH_HEADER_PREFIX = "Authorization-refresh";
 
+  private final JwtProvider jwtProvider;
+  private final RedisTokenProvider redisTokenProvider;
   private final PasswordEncoder passwordEncoder;
 
-  public JsonPrincipalAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher,
+  public CustomAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher,
       AuthenticationManager authenticationManager,
-      JsonWebTokenIssuer jwtIssuer,
-      PasswordEncoder passwordEncoder) {
+      JwtProvider jwtProvider,
+      PasswordEncoder passwordEncoder,
+      RedisTokenProvider redisTokenProvider) {
     super(requiresAuthenticationRequestMatcher, authenticationManager);
-    this.jwtIssuer = jwtIssuer;
+    this.jwtProvider = jwtProvider;
     this.passwordEncoder = passwordEncoder;
+    this.redisTokenProvider = redisTokenProvider;
   }
 
   @Override
@@ -77,16 +83,50 @@ public class JsonPrincipalAuthenticationFilter extends AbstractAuthenticationPro
   protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain, Authentication authResult) throws IOException, ServletException {
 
-    String accessToken = jwtIssuer.createAccessToken(authResult);
-    response.addHeader(HEADER_STRING, GRANT_TYPE_BEARER + accessToken);
+    String authority = authResult.getAuthorities().stream().toList().get(0).toString();
+    String email = (String) authResult.getPrincipal();
+
+    String accessToken = jwtProvider.createAccessToken(email, authority);
+    response.addHeader(HEADER_PREFIX, TOKEN_PREFIX + accessToken);
+
+    String refreshToken = jwtProvider.createRefreshToken(email);
+    redisTokenProvider.saveRefreshToken(email, refreshToken);
+    response.addHeader(REFRESH_HEADER_PREFIX, TOKEN_PREFIX + refreshToken);
+
+    setSuccessResponse(response, "success");
     super.successfulAuthentication(request, response, chain, authResult);
   }
 
   @Override
   protected void unsuccessfulAuthentication(HttpServletRequest request,
       HttpServletResponse response, AuthenticationException failed)
-      throws IOException, ServletException {
-    log.debug("login fail");
+      throws IOException, ServletException { //적용 안됨, 일반 에러 메시지 출력
+    String failMessage = failed.getMessage();
+    setFailResponse(response, failMessage);
     super.unsuccessfulAuthentication(request, response, failed);
+  }
+
+  private void setSuccessResponse(HttpServletResponse response, String message) throws IOException {
+    response.setStatus(HttpServletResponse.SC_OK);
+    response.setContentType("application/json;charset=UTF-8");
+
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("success", true);
+    jsonObject.put("code", 1);
+    jsonObject.put("message", message);
+
+    response.getWriter().print(jsonObject);
+  }
+
+  private void setFailResponse(HttpServletResponse response, String message) throws IOException {
+    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    response.setContentType("application/json;charset=UTF-8");
+
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("success", false);
+    jsonObject.put("code", -1);
+    jsonObject.put("message", message);
+
+    response.getWriter().print(jsonObject);
   }
 }
