@@ -63,13 +63,12 @@ public class JwtProvider {
   public String createRefreshToken(String username) {
     Date now = new Date(System.currentTimeMillis());
     Claims claims = Jwts.claims().setSubject(username);
-    String refreshToken = Jwts.builder()
+    return Jwts.builder()
         .setHeaderParam(TYPE, JWT_TYPE)
         .setClaims(claims)
         .setExpiration(new Date(now.getTime() + ONE_MINUTE * refreshExpireMin))
         .signWith(SignatureAlgorithm.HS256, refreshSecretKeyBytes)
         .compact();
-    return refreshToken;
   }
 
 
@@ -102,7 +101,6 @@ public class JwtProvider {
     }
   }
 
-  // 토큰을 받아 클레임을 만들고 권한정보를 빼서 시큐리티 유저객체를 만들어 Authentication 객체 반환
   public Authentication getAuthentication(String token) {
     Claims claims = Jwts.parser()
         .setSigningKey(secretKeyBytes)
@@ -129,21 +127,34 @@ public class JwtProvider {
 
   }
 
-  // 토큰 만료일자 조회
-  public Date getExpirationDateFromRefreshToken(String token) {
-    return getClaimFromRefreshToken(token, Claims::getExpiration);
+  public Date getExpirationDateFromToken(String token, String keyType) {
+    byte[] secret = keyType.equals("ACCESS") ? secretKeyBytes
+        : keyType.equals("REFRESH") ? refreshSecretKeyBytes
+            : null;
+    if (secret == null) {
+      throw new NullPointerException("not found key");
+    }
+    return getClaimFromToken(token, secret, Claims::getExpiration);
   }
 
-  public String getUsernameFromRefreshToken(String refreshToken) {
-    return getClaimFromRefreshToken(refreshToken, Claims::getSubject);
+  public String getUsernameFromToken(String accessToken, String keyType) {
+    byte[] secret = keyType.equals("ACCESS") ? secretKeyBytes
+        : keyType.equals("REFRESH") ? refreshSecretKeyBytes
+            : null;
+    if (secret == null) {
+      throw new NullPointerException("not found key");
+    }
+    return getClaimFromToken(accessToken, secret, Claims::getSubject);
   }
 
-  public <T> T getClaimFromRefreshToken(String token, Function<Claims, T> claimsResolver) {
-    final Claims claims = getAllClaimsFromRefreshToken(token);
+  private <T> T getClaimFromToken(String accessToken, byte[] secretKey,
+      Function<Claims, T> claimsResolver) {
+    final Claims claims = getAllClaimsFromToken(accessToken, secretKey);
     return claimsResolver.apply(claims);
   }
 
-  private Claims getAllClaimsFromRefreshToken(String token) {
-    return Jwts.parser().setSigningKey(refreshSecretKeyBytes).parseClaimsJws(token).getBody();
+  private Claims getAllClaimsFromToken(String token, byte[] secretKey) {
+    return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
   }
+
 }

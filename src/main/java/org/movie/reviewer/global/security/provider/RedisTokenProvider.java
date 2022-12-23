@@ -11,14 +11,17 @@ public class RedisTokenProvider {
 
   private final RedisTemplate<String, String> redisTemplate;
 
-  public void saveRefreshToken(String username, String refreshToken){
-    redisTemplate.opsForValue().set(username,refreshToken);
+  public void saveRefreshToken(String username, String refreshToken) {
+    redisTemplate.opsForValue().set(username, refreshToken);
   }
 
-  public boolean isEqualTokenByUsername(String username, String token){
+  public boolean isEqualTokenByUsername(String username, String token) {
     String refreshToken = redisTemplate.opsForValue().get(username);
     return StringUtils.hasText(refreshToken) && refreshToken.equals(token);
   }
 
 
+  public void deleteByEmail(String email) {
+    redisTemplate.opsForValue().getAndDelete(email);
+  }
 }

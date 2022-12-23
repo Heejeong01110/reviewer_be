@@ -22,6 +22,7 @@ public class RedisTokenService {
 
   @Value("${jwt.refresh-reissue-day}")
   private static int refreshReissueDay;
+
   private final JwtProvider jwtProvider;
   private final RedisTokenProvider redisTokenProvider;
   private final PrincipalDetailsService principalDetailsService;
@@ -39,7 +40,7 @@ public class RedisTokenService {
   public boolean isReissuePeriod(String refreshToken) {
     //만료기간이 넘지는 않았지만 현재시간+1일 보다 과거일 때
     Date now = new Date(System.currentTimeMillis());
-    Date expirationDate = jwtProvider.getExpirationDateFromRefreshToken(refreshToken);
+    Date expirationDate = jwtProvider.getExpirationDateFromToken(refreshToken, "REFRESH");
     return expirationDate.after(now) && expirationDate.before(getAfterReissueDayFromCurrent(now));
   }
 
@@ -51,7 +52,7 @@ public class RedisTokenService {
   }
 
   public boolean isNotNeedReissue(String refreshToken) {
-    return jwtProvider.getExpirationDateFromRefreshToken(refreshToken)
+    return jwtProvider.getExpirationDateFromToken(refreshToken, "REFRESH")
         .after(getAfterReissueDayFromCurrent(new Date(System.currentTimeMillis())));
   }
 
@@ -70,7 +71,6 @@ public class RedisTokenService {
     return jwtProvider.createAccessToken(email,authorities);
   }
 
-
   @Transactional
   public TokenDto reissue(TokenDto tokenDto) {
     String accessToken = tokenDto.getAccessToken();
@@ -79,31 +79,28 @@ public class RedisTokenService {
     //1. access토큰이 기간만 만료된 유효한 토큰인지 확인
     checkAccessTokenReissue(accessToken);
 
-    String reissueAccessToken = accessToken;
-    String reissueRefreshToken = refreshToken;
-    
     //2. refreshToken이 유효한지 확인
     //2-0-0. 유효한 토큰인지 확인
-    try{
+    try {
       jwtProvider.validRefreshToken(refreshToken);
-    }catch (ExpiredJwtException exception){ //유효기간 만료
-      throw new NotFoundException(ErrorMessage.USER_NOT_FOUND,"Test중 - 토큰 만료. 재 로그인 필요");
+    } catch (ExpiredJwtException exception) { //유효기간 만료
+      throw new NotFoundException(ErrorMessage.USER_NOT_FOUND, "Test중 - 토큰 만료. 재 로그인 필요");
     }
 
     //2-0-1. 저장되어있는 토큰인지 확인
-    String email = jwtProvider.getUsernameFromRefreshToken(refreshToken);
-    if(!redisTokenProvider.isEqualTokenByUsername(email,refreshToken)){
-      throw new NotFoundException(ErrorMessage.USER_NOT_FOUND,"Test중 - refresh token 무효");
+    String email = jwtProvider.getUsernameFromToken(refreshToken, "REFRESH");
+    if (!redisTokenProvider.isEqualTokenByUsername(email, refreshToken)) {
+      throw new NotFoundException(ErrorMessage.USER_NOT_FOUND, "Test중 - refresh token 무효");
     }
 
+    String reissueAccessToken = accessToken;
+    String reissueRefreshToken = refreshToken;
     //2-1. 토큰 체크
-    if(isNotNeedReissue(refreshToken)){ //여유가 많이 남았을 경우 accessToken만 재발급
-
+    if (isNotNeedReissue(refreshToken)) { //여유가 많이 남았을 경우 accessToken만 재발급
       reissueAccessToken = reissueAccessToken(email);
-
-    }else if(isReissuePeriod(refreshToken)){//재갱신 가능 기간일 경우 refreshToken 재발급
+    } else if (isReissuePeriod(refreshToken)) {//재갱신 가능 기간일 경우 refreshToken 재발급
+      reissueAccessToken = reissueAccessToken(email);
       reissueRefreshToken = reissueRefreshToken(email);
-      reissueAccessToken = reissueAccessToken(email);
     }
 
     return TokenDto.builder()
@@ -112,6 +109,22 @@ public class RedisTokenService {
         .build();
   }
 
+  @Transactional
+  public void logout(TokenDto token) {
+    try {
+      jwtProvider.validAccessToken(token.getAccessToken());
+    } catch (JwtInvalidException | ExpiredJwtException exception) { //검증 X
+      throw new NotFoundException(ErrorMessage.USER_NOT_FOUND, "Test중 - 검증되지 않음 ");
+    }
 
-  //logout일 때 토큰 삭제
+    try {
+      jwtProvider.validRefreshToken(token.getRefreshToken());
+    } catch (JwtInvalidException | ExpiredJwtException exception) {
+      throw new NotFoundException(ErrorMessage.USER_NOT_FOUND, "Test중 - 무효 토큰의 로그아웃 시도");
+    }
+
+    String email = jwtProvider.getUsernameFromToken(token.getAccessToken(), "ACCESS");
+    redisTokenProvider.deleteByEmail(email);
+  }
+
 }
