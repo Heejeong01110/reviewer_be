@@ -1,6 +1,6 @@
 package org.movie.reviewer.global.config;
 
-import org.movie.reviewer.domain.auth.service.PrincipalDetailsService;
+import org.movie.reviewer.domain.user.service.CustomUserDetailsService;
 import org.movie.reviewer.global.security.filter.CustomAuthenticationFilter;
 import org.movie.reviewer.global.security.filter.JwtAuthorizationFilter;
 import org.movie.reviewer.global.security.handler.CustomAccessDeniedHandler;
@@ -36,13 +36,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   private final String ROLE_NORMAL = "NORMAL";
   private final JwtProvider jwtProvider;
   private final RedisTokenProvider redisTokenProvider;
-  private final PrincipalDetailsService userDetailsService;
+  private final CustomUserDetailsService userDetailsService;
 
 
   public WebSecurityConfig(
       JwtProvider jwtProvider,
       RedisTokenProvider redisTokenProvider,
-      PrincipalDetailsService userDetailsService) {
+      CustomUserDetailsService userDetailsService) {
     this.jwtProvider = jwtProvider;
     this.redisTokenProvider = redisTokenProvider;
     this.userDetailsService = userDetailsService;

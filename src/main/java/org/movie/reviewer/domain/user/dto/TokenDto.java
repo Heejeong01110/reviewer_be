@@ -1,4 +1,4 @@
-package org.movie.reviewer.domain.auth.dto;
+package org.movie.reviewer.domain.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

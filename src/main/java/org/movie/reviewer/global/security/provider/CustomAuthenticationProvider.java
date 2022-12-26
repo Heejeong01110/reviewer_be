@@ -1,7 +1,7 @@
 package org.movie.reviewer.global.security.provider;
 
 import lombok.RequiredArgsConstructor;
-import org.movie.reviewer.domain.auth.service.PrincipalDetailsService;
+import org.movie.reviewer.domain.user.service.CustomUserDetailsService;
 import org.movie.reviewer.global.security.tokens.JsonPrincipalAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
-  private final PrincipalDetailsService userDetailsService;
+  private final CustomUserDetailsService userDetailsService;
 
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {

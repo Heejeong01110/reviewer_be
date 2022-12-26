@@ -1,9 +1,9 @@
-package org.movie.reviewer.domain.auth.controller;
+package org.movie.reviewer.domain.user.api;
 
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.movie.reviewer.domain.auth.dto.TokenDto;
-import org.movie.reviewer.domain.auth.service.RedisTokenService;
+import org.movie.reviewer.domain.user.dto.TokenDto;
+import org.movie.reviewer.domain.user.service.RedisTokenService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
