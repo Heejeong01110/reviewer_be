@@ -1,4 +1,4 @@
-package org.movie.reviewer.global.security.config;
+package org.movie.reviewer.global.config;
 
 import org.movie.reviewer.domain.auth.service.PrincipalDetailsService;
 import org.movie.reviewer.global.security.filter.CustomAuthenticationFilter;
