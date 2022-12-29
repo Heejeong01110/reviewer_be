@@ -30,8 +30,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-  private static final RequestMatcher LOGIN_REQUEST_MATCHER = new AntPathRequestMatcher(
-      "/api/v1/login", "POST");
+  private static final RequestMatcher LOGIN_REQUEST_MATCHER =
+      new AntPathRequestMatcher("/api/v1/login", "POST");
   private final String ROLE_ADMIN = "ADMIN";
   private final String ROLE_NORMAL = "NORMAL";
   private final JwtProvider jwtProvider;
