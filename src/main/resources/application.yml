@@ -45,20 +45,6 @@ jwt:
   refresh-secret: refreshSecretKey
   refresh-expire-min: 30
   refresh-reissue-day: 1
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-    groups-order: DESC
-    operationsSorter: method
-    disable-swagger-default-url: true
-    display-request-duration: true
-  api-docs:
-    path: /api-docs
-  show-actuator: true
-  default-consumes-media-type: application/json
-  default-produces-media-type: application/json
-  paths-to-match:
-    - /**
 logging:
   level:
     root: info

@@ -20,4 +20,5 @@ public class SignUpRequest {
   public void encodePassword(String password) {
     this.password = password;
   }
+
 }

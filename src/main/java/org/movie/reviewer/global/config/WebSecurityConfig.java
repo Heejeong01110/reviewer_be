@@ -53,25 +53,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   public void configure(WebSecurity web) {
     web.ignoring()
         .antMatchers("/h2-console/**")
-        .antMatchers("/assets/**");
+        .antMatchers("/assets/**")
+        .antMatchers("/swagger-ui/**")
+        .antMatchers("/api-docs/**");
   }
 
   //시큐리티 규칙
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    // 인증 필터 -> AbstractAuthenticationProcessingFilter 구현체
-    CustomAuthenticationFilter customAuthenticationFilter =
-        new CustomAuthenticationFilter(
-            LOGIN_REQUEST_MATCHER,
-            authenticationManagerBean(),
-            jwtProvider,
-            passwordEncoder(),
-            redisTokenProvider);
-    customAuthenticationFilter
-        .setAuthenticationSuccessHandler(authenticationSuccessHandler());
-    customAuthenticationFilter
-        .setAuthenticationFailureHandler(authenticationFailureHandler());
-
     http
         .httpBasic().disable() // rest api 이므로 기본설정 사용안함. 기본설정은 비인증시 로그인폼 화면으로 리다이렉트 된다.
         .csrf().disable() //csrf 설정
@@ -83,12 +72,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .exceptionHandling() //에러 핸들러 설정
-//        .authenticationEntryPoint(authenticationEntryPoint())
         .accessDeniedHandler(accessDeniedHandler())
         .and()
-        // 인증 필터 -> AbstractAuthenticationProcessingFilter 구현체
-        .addFilterAt(customAuthenticationFilter,
-            UsernamePasswordAuthenticationFilter.class) //지정된 필터 순서에 커스텀 필터 추가. 지정된 필터보다 커스텀 필터가 먼저 실행됨
+        .addFilterAt(customAuthenticationFilter(),UsernamePasswordAuthenticationFilter.class) //지정된 필터 순서에 커스텀 필터 추가. 지정된 필터보다 커스텀 필터가 먼저 실행됨
         .authorizeRequests()
 //        .antMatchers("/accounts/**").hasAnyRole(ROLE_ADMIN, ROLE_NORMAL)
         .anyRequest().permitAll();
@@ -101,6 +87,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
   }
 
+  @Bean //인증 필터 -> AbstractAuthenticationProcessingFilter 구현체
+  public CustomAuthenticationFilter customAuthenticationFilter() throws Exception {
+    CustomAuthenticationFilter customAuthenticationFilter =
+        new CustomAuthenticationFilter(
+            LOGIN_REQUEST_MATCHER,
+            authenticationManagerBean(),
+            jwtProvider,
+            passwordEncoder(),
+            redisTokenProvider);
+    customAuthenticationFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler());
+    customAuthenticationFilter.setAuthenticationFailureHandler(authenticationFailureHandler());
+    return customAuthenticationFilter;
+  }
 
   @Bean //인가 필터 -> OncePerRequestFilter 구현체
   public JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception {
@@ -131,11 +130,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   public AuthenticationFailureHandler authenticationFailureHandler() {
     return new JwtAuthenticationFailHandler();
   }
-
-//  @Bean
-//  public AuthenticationEntryPoint authenticationEntryPoint() {
-//    return new CustomAuthenticationEntryPoint();
-//  }
 
   @Bean
   public AccessDeniedHandler accessDeniedHandler() {
