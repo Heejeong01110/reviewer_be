@@ -13,7 +13,6 @@ import org.movie.reviewer.domain.user.dto.response.UserDetailResponse;
 import org.movie.reviewer.domain.user.repository.UserRepository;
 import org.movie.reviewer.global.exception.ErrorMessage;
 import org.movie.reviewer.global.exception.NotFoundException;
-import org.movie.reviewer.global.security.provider.JwtProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,23 +36,36 @@ public class UserService {
     return UserConverter.toUserDetailResponse(user, reviews, ratings);
   }
 
-  public boolean checkEmailDuplicate(String email) {
+  public boolean isDuplicatedEmail(String email) {
     return !userRepository.existsByEmail(email);
   }
 
-  public boolean checkNicknameDuplicate(String nickname) {
+  public boolean isDuplicatedNickname(String nickname) {
     return !userRepository.existsByNickname(nickname);
   }
 
   @Transactional
   public User save(SignUpRequest request) {
-    if (!checkEmailDuplicate(request.getEmail()) ||
-        !checkNicknameDuplicate(request.getNickname())) {
-      throw new RuntimeException();
+    if (!isDuplicatedEmail(request.getEmail()) ||
+        !isDuplicatedNickname(request.getNickname())) {
+      throw new RuntimeException("test중 - 아이디 또는 닉네임 중복");
     }
 
     request.encodePassword(passwordEncoder.encode(request.getPassword()));
     return userRepository.save(UserConverter.toUser(request));
   }
 
+
+  public boolean checkPasswordValid(User user, String password) {
+    if (!passwordEncoder.matches(password, user.getPassword())) {
+      throw new RuntimeException("test중 - 일치하지 않는 이메일입니다.");
+    }
+    return true;
+  }
+
+  public User updateUserEmail(User user, String email) {
+    user.updateEmail(email);
+    userRepository.save(user);
+    return user;
+  }
 }

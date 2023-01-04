@@ -3,6 +3,7 @@ package org.movie.reviewer.domain.user.service;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -27,8 +28,11 @@ import org.movie.reviewer.domain.review_comment.domain.ReviewComment;
 import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.domain.UserRole;
 import org.movie.reviewer.domain.user.dto.UserConverter;
+import org.movie.reviewer.domain.user.dto.request.SignUpRequest;
 import org.movie.reviewer.domain.user.dto.response.UserDetailResponse;
 import org.movie.reviewer.domain.user.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -46,6 +50,12 @@ class UserServiceTest {
   @Mock
   private RatingService ratingService;
 
+  @Mock
+  private PasswordEncoder passwordEncoder;
+
+  @Mock
+  private UserConverter userConverter;
+
   private Movie movie = Movie.builder()
       .id(0L)
       .country("KR")
@@ -62,7 +72,7 @@ class UserServiceTest {
       .id(0L)
       .email("movieStar@gmail.com")
       .nickname("movieStar11")
-      .password("test1234")
+      .password("{bcrypt}$2a$10$HvKBACAuzrvJGvpKcb8S3O7RX8uqg72U/dD5TD/3L.ps3c9Ydng6i")
       .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
       .profileImage(null)
       .authority(UserRole.ROLE_MEMBER)
@@ -88,6 +98,11 @@ class UserServiceTest {
       .rating(5.0)
       .user(user)
       .movie(movie)
+      .build();
+  private SignUpRequest signUpRequest = SignUpRequest.builder()
+      .email(user.getEmail())
+      .nickname(user.getNickname())
+      .password("test1234")
       .build();
 
   @Test
@@ -135,10 +150,10 @@ class UserServiceTest {
     given(userRepository.existsByEmail(user.getEmail())).willReturn(true);
 
     //when
-    boolean actual = userService.checkEmailDuplicate(user.getEmail());
+    boolean actual = userService.isDuplicatedEmail(user.getEmail());
 
     //then
-    then(userService).should().checkEmailDuplicate(user.getEmail());
+    then(userService).should().isDuplicatedEmail(user.getEmail());
     then(userRepository).should().existsByEmail(user.getEmail());
 
     assertThat(actual, is(false));
@@ -150,12 +165,93 @@ class UserServiceTest {
     given(userRepository.existsByNickname(user.getNickname())).willReturn(true);
 
     //when
-    boolean actual = userService.checkNicknameDuplicate(user.getNickname());
+    boolean actual = userService.isDuplicatedNickname(user.getNickname());
 
     //then
-    then(userService).should().checkNicknameDuplicate(user.getNickname());
+    then(userService).should().isDuplicatedNickname(user.getNickname());
     then(userRepository).should().existsByNickname(user.getNickname());
 
     assertThat(actual, is(false));
   }
+
+  @Test
+  void save() {
+    //given
+
+    String signupEmail = user.getEmail();
+    String encodedPassword = user.getPassword();
+    String nickname = user.getNickname();
+
+    SignUpRequest request = SignUpRequest.builder()
+        .email(signupEmail)
+        .nickname(nickname)
+        .password("test1234")
+        .build();
+
+    User user = User.builder()
+        .email(request.getEmail())
+        .password(encodedPassword)
+        .nickname(request.getNickname())
+        .authority(UserRole.ROLE_MEMBER)
+        .build();
+    ReflectionTestUtils.setField(user, "id", 2L);
+
+    given(userRepository.existsByEmail(signupEmail)).willReturn(false);
+    given(userRepository.existsByNickname(nickname)).willReturn(false);
+    given(passwordEncoder.encode(request.getPassword())).willReturn(encodedPassword);
+    given(userRepository.save(any())).willReturn(user);
+
+    //when
+    User actual = userService.save(request);
+
+    //then
+    then(userService).should().save(request);
+    then(userRepository).should().existsByEmail(signUpRequest.getEmail());
+    then(userRepository).should().existsByNickname(signUpRequest.getNickname());
+    then(userRepository).should().save(any());
+
+    assertThat(actual, samePropertyValuesAs(user));
+
+  }
+
+  @Test
+  void checkPasswordValid() {
+    //given
+    given(passwordEncoder.matches("test1234", user.getPassword())).willReturn(true);
+
+    //when
+    boolean actual = userService.checkPasswordValid(user, "test1234");
+
+    //then
+    then(userService).should().checkPasswordValid(user, "test1234");
+    assertThat(actual, is(true));
+
+  }
+
+  @Test
+  void updateUserEmail() {
+    //given
+    String updatedEmail = "testEmail@gmail.com";
+    User updatedUser = User.builder()
+        .id(0L)
+        .email(updatedEmail)
+        .nickname("movieStar11")
+        .password("{bcrypt}$2a$10$HvKBACAuzrvJGvpKcb8S3O7RX8uqg72U/dD5TD/3L.ps3c9Ydng6i")
+        .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
+        .profileImage(null)
+        .authority(UserRole.ROLE_MEMBER)
+        .build();
+
+    given(userRepository.save(any())).willReturn(updatedUser);
+
+    //when
+    User actual = userService.updateUserEmail(user, updatedEmail);
+
+    //then
+    then(userService).should().updateUserEmail(user, updatedEmail);
+    then(userRepository).should().save(any());
+    assertThat(actual, samePropertyValuesAs(updatedUser));
+
+  }
+
 }

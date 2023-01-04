@@ -1,10 +1,11 @@
 package org.movie.reviewer.domain.user.dto;
 
 import java.util.List;
-import org.movie.reviewer.domain.user.domain.CustomUserDetails;
 import org.movie.reviewer.domain.rating.dto.response.UserRatingResponse;
 import org.movie.reviewer.domain.review.dto.response.UserReviewResponse;
+import org.movie.reviewer.domain.user.domain.CustomUserDetails;
 import org.movie.reviewer.domain.user.domain.User;
+import org.movie.reviewer.domain.user.domain.UserRole;
 import org.movie.reviewer.domain.user.dto.request.SignUpRequest;
 import org.movie.reviewer.domain.user.dto.response.UserDetailResponse;
 import org.movie.reviewer.domain.user.dto.response.UserSimpleInfo;
@@ -38,10 +39,12 @@ public class UserConverter {
         .email(request.getEmail())
         .password(request.getPassword())
         .nickname(request.getNickname())
+        .authority(UserRole.ROLE_MEMBER)
         .build();
   }
 
   public static CustomUserDetails toUserDetails(User user) {
     return new CustomUserDetails(user);
   }
+
 }
