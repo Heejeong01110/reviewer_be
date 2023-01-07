@@ -1,4 +1,4 @@
-package org.movie.reviewer.global.config;
+package org.movie.reviewer.global.security.config;
 
 import org.movie.reviewer.domain.user.service.CustomUserDetailsService;
 import org.movie.reviewer.global.security.filter.CustomAuthenticationFilter;
@@ -33,7 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   private static final RequestMatcher LOGIN_REQUEST_MATCHER =
       new AntPathRequestMatcher("/api/v1/login", "POST");
   private final String ROLE_ADMIN = "ADMIN";
-  private final String ROLE_NORMAL = "NORMAL";
+  private final String ROLE_MEMBER = "MEMBER";
   private final JwtProvider jwtProvider;
   private final RedisTokenProvider redisTokenProvider;
   private final CustomUserDetailsService userDetailsService;

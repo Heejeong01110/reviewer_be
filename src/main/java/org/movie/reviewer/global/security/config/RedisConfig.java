@@ -1,4 +1,4 @@
-package org.movie.reviewer.global.config;
+package org.movie.reviewer.global.security.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
