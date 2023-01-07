@@ -160,7 +160,7 @@ class reviewApiTest {
             preprocessResponse(prettyPrint()),
             responseFields(
                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("리뷰 고유번호"),
-                fieldWithPath("[].title").type(JsonFieldType.STRING).description("리뷰 내용"),
+                fieldWithPath("[].title").type(JsonFieldType.STRING).description("리뷰 제목"),
                 fieldWithPath("[].commentCount").type(JsonFieldType.NUMBER).description("댓글 갯수"),
                 fieldWithPath("[].user").type(JsonFieldType.OBJECT).description("유저"),
                 fieldWithPath("[].user.id").type(JsonFieldType.NUMBER).description("유저 고유번호"),
