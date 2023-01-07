@@ -2,6 +2,8 @@ package org.movie.reviewer.domain.movie.api;
 
 
 import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
@@ -34,11 +36,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -141,10 +142,13 @@ class MovieApiTest {
             preprocessRequest(prettyPrint()),
             preprocessResponse(prettyPrint()),
             pathParameters(parameterWithName("id").description("영화 고유번호")),
+            requestHeaders(
+                headerWithName(HttpHeaders.ACCEPT).description("accept type"),
+                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type")),
             responseFields(
                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("고유번호"),
                 fieldWithPath("title").type(JsonFieldType.STRING).description("영화명"),
-                fieldWithPath("movieImage").type(JsonFieldType.STRING).description("영화 포스터 사진 주소"),
+                fieldWithPath("movieImage").type(JsonFieldType.STRING).description("영화 포스터 url"),
                 fieldWithPath("genre").type(JsonFieldType.STRING).description("영화 장르"),
                 fieldWithPath("country").type(JsonFieldType.STRING).description("국가명"),
                 fieldWithPath("runningTime").type(JsonFieldType.NUMBER).description("러닝 타임"),
@@ -155,39 +159,41 @@ class MovieApiTest {
                 fieldWithPath("actors[].id").type(JsonFieldType.NUMBER).description("배우 고유번호"),
                 fieldWithPath("actors[].name").type(JsonFieldType.STRING).description("배우명"),
                 fieldWithPath("actors[].role").type(JsonFieldType.STRING).description("역할")
-                )
+            )
         ));
   }
 
 
-//  @Test
-//  @WithMockUser(username = "movieStar@gamil.com", password = "test1234", roles = "ROLE_MEMBER")
-//  void givenValidUserToken_whenGetMovies_thenMovieList() throws Exception {
-//    //given
-//    List<MovieTitleResponse> movies = List.of(
-//        MovieConverter.toMovieTitleResponse(movie1, movieTitleResponse1.getRating()),
-//        MovieConverter.toMovieTitleResponse(movie2, movieTitleResponse2.getRating()));
-//
-//    given(movieService.getMovieTitleList()).willReturn(movies);
-//
-//    //when
-//    ResultActions result = mockMvc.perform(
-//        get("/api/v1/movies")
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON)
-//    );
-//
-//    //then
-////    result.andExpect(status().isOk())
-////        .andDo(document("movie/movies", //adoc 파일을 생성할 폴더 및 파일명
-////            getDocumentRequest(), //ApiDocumentUtils
-////            getDocumentResponse(), //ApiDocumentUtils
-////            requestFields(),
-////            responseFields(
-////                fieldWithPath("")
-////            )
-////        ));
-//
-//  }
+  @Test
+  @WithMockCustomUser
+  void givenValidUserToken_whenGetMovies_thenMovieList() throws Exception {
+    //given
+    List<MovieTitleResponse> movies = List.of(
+        MovieConverter.toMovieTitleResponse(movie1, movieTitleResponse1.getRating()),
+        MovieConverter.toMovieTitleResponse(movie2, movieTitleResponse2.getRating()));
+
+    given(movieService.getMovieTitleList()).willReturn(movies);
+
+    //when
+    ResultActions result = mockMvc.perform(
+        get("/api/v1/movies")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+    );
+
+    //then
+    result.andExpect(status().isOk())
+        .andDo(document("movie/get-movies",
+            preprocessRequest(prettyPrint()),
+            preprocessResponse(prettyPrint()),
+            responseFields(
+                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("영화 고유번호"),
+                fieldWithPath("[].title").type(JsonFieldType.STRING).description("영화명"),
+                fieldWithPath("[].movieImage").type(JsonFieldType.STRING)
+                    .description("영화 포스터 url"),
+                fieldWithPath("[].rating").type(JsonFieldType.NUMBER).description("별점")
+            )
+        ));
+  }
 
 }
