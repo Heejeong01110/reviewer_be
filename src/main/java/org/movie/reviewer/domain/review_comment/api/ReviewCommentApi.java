@@ -25,7 +25,7 @@ public class ReviewCommentApi {
     return ResponseEntity.ok(reviewCommentService.getReviewComments(reviewId));
   }
 
-  @GetMapping("/accounts/{userId}/comments")
+  @GetMapping("accounts/{userId}/comments")
   public ResponseEntity<List<UserCommentResponse>> getReviewsByUserId(
       @PathVariable("userId") Long userId) {
     return ResponseEntity.ok(reviewCommentService.getCommentsByUserId(userId));
