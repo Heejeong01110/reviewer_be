@@ -17,8 +17,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.movie.reviewer.domain.movie.domain.Movie;
-import org.movie.reviewer.domain.movie.dto.MovieConverter;
-import org.movie.reviewer.domain.movie.dto.response.MovieCardInfo;
 import org.movie.reviewer.domain.rating.service.RatingService;
 import org.movie.reviewer.domain.review.domain.Review;
 import org.movie.reviewer.domain.review.dto.ReviewConverter;
@@ -30,7 +28,6 @@ import org.movie.reviewer.domain.review.dto.response.UserReviewResponse;
 import org.movie.reviewer.domain.review.repository.ReviewRepository;
 import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.domain.UserRole;
-import org.movie.reviewer.domain.user.dto.UserConverter;
 import org.movie.reviewer.domain.user.dto.response.UserSimpleInfo;
 
 @ExtendWith(MockitoExtension.class)
@@ -64,7 +61,7 @@ class ReviewServiceTest {
       .nickname("movieStar11")
       .password("test1234")
       .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
-      .profileImage(null)
+      .profileImage("https://blog.kakaocdn.net/dn/bj4oa7/btqLJWFLMgd/wu4GV8PKbXdICuyW0me0zk/img.jpg")
       .authority(UserRole.ROLE_MEMBER)
       .build();
 
@@ -73,50 +70,52 @@ class ReviewServiceTest {
       .title("결국, 고전이 되었나보다.")
       .contents(
           "개봉 당시에는 이게 고전이 되리라고 생각해본 적 없다. 그러나 뤽 베송의 재능이 쪼그라든 지금 다시 보자니, 울컥하는 감정이 치밀만큼 아름다운 데가 있다.")
+      .likeCount(3L)
       .user(user)
       .movie(movie)
       .build();
-  private ReviewTitleInfo info1 = ReviewTitleInfo.builder()
-      .reviewId(review1.getId())
-      .reviewTitle(review1.getTitle())
-      .commentCount(3L)
-      .userId(review1.getUser().getId())
-      .nickname(review1.getUser().getNickname())
-      .profileImage(review1.getUser().getProfileImage())
-      .movieId(review1.getMovie().getId())
-      .movieTitle(review1.getMovie().getTitle())
-      .movieImage(review1.getMovie().getMovieImage())
-      .build();
-  private ReviewTitleResponse response1 = ReviewConverter.toReviewTitleResponse(info1);
   private Review review2 = Review.builder()
       .id(0L)
       .title("킬러의 전설")
       .contents(
           "고독한 킬러, 화분을 든 소녀, 광기의 경찰. 그리고 'Shape of My Heart'의 엔딩. 킬러에 대한 수많은 영화들이 있지만 [레옹]처럼 심금을 울리는 작품은 많지 않다.")
+      .likeCount(1L)
       .user(user)
       .movie(movie)
       .build();
-  private ReviewTitleInfo info2 = ReviewTitleInfo.builder()
-      .reviewId(review2.getId())
-      .reviewTitle(review2.getTitle())
-      .commentCount(10L)
-      .userId(review2.getUser().getId())
-      .nickname(review2.getUser().getNickname())
-      .profileImage(review2.getUser().getProfileImage())
-      .movieId(review2.getMovie().getId())
-      .movieTitle(review2.getMovie().getTitle())
-      .movieImage(review2.getMovie().getMovieImage())
-      .build();
-  private ReviewTitleResponse response2 = ReviewConverter.toReviewTitleResponse(info2);
-
 
   @Test
   void getReviewTitleList() {
     //given
-    List<ReviewTitleResponse> expected = List.of(response1, response2);
-    List<ReviewTitleInfo> infos = List.of(info1, info2);
+    ReviewTitleInfo info1 = ReviewTitleInfo.builder()
+        .reviewId(review1.getId())
+        .reviewTitle(review1.getTitle())
+        .commentCount(3L)
+        .userId(review1.getUser().getId())
+        .nickname(review1.getUser().getNickname())
+        .profileImage(review1.getUser().getProfileImage())
+        .movieId(review1.getMovie().getId())
+        .movieTitle(review1.getMovie().getTitle())
+        .movieImage(review1.getMovie().getMovieImage())
+        .build();
 
-    given(reviewRepository.findReviewTitleAll()).willReturn(infos);
+    ReviewTitleInfo info2 = ReviewTitleInfo.builder()
+        .reviewId(review2.getId())
+        .reviewTitle(review2.getTitle())
+        .commentCount(10L)
+        .userId(review2.getUser().getId())
+        .nickname(review2.getUser().getNickname())
+        .profileImage(review2.getUser().getProfileImage())
+        .movieId(review2.getMovie().getId())
+        .movieTitle(review2.getMovie().getTitle())
+        .movieImage(review2.getMovie().getMovieImage())
+        .build();
+
+    List<ReviewTitleResponse> expected = List.of(
+        ReviewConverter.toReviewTitleResponse(info1),
+        ReviewConverter.toReviewTitleResponse(info2));
+
+    given(reviewRepository.findReviewTitleAll()).willReturn(List.of(info1, info2));
 
     //when
     List<ReviewTitleResponse> actual = reviewService.getReviewTitleList();
@@ -141,13 +140,11 @@ class ReviewServiceTest {
   @Test
   void getReviewById() {
     //given
-    MovieCardInfo movieCardInfo = MovieConverter.toMovieCardInfo(review1.getMovie(), 4.5);
-    UserSimpleInfo userSimpleInfo = UserConverter.toUserSimpleInfo(review1.getUser());
+    ReviewDetailResponse expected = ReviewConverter.toReviewDetailResponse(review1, 4.5);
 
-    given(reviewRepository.findReviewDetailById(review1.getId())).willReturn(
-        Optional.of(review1));
-    given(ratingService.getRatingScoreByMovieId(review1.getMovie().getId())).willReturn(
-        movieCardInfo.getRating());
+    given(reviewRepository.findReviewDetailById(review1.getId())).willReturn(Optional.of(review1));
+    given(ratingService.getRatingScoreByMovieId(review1.getMovie().getId()))
+        .willReturn(expected.getMovie().getRating());
 
     //when
     ReviewDetailResponse actual = reviewService.getReviewById(review1.getId());
@@ -159,38 +156,16 @@ class ReviewServiceTest {
     assertThat(actual.getId(), is(review1.getId()));
     assertThat(actual.getTitle(), equalTo(review1.getTitle()));
     assertThat(actual.getContents(), equalTo(review1.getContents()));
-    assertThat(actual.getMovie(), samePropertyValuesAs(movieCardInfo));
-    assertThat(actual.getUser(), samePropertyValuesAs(userSimpleInfo));
+    assertThat(actual.getMovie(), samePropertyValuesAs(expected.getMovie()));
+    assertThat(actual.getUser(), samePropertyValuesAs(expected.getUser()));
   }
 
   @Test
   void getSimpleReviewsByMovieId() {
     //given
-    ReviewSimpleResponse response1 = ReviewSimpleResponse.builder()
-        .id(review1.getId())
-        .title(review1.getTitle())
-        .contents(review1.getContents())
-        .updatedAt(LocalDateTime.now())
-        .user(UserSimpleInfo.builder()
-            .id(review1.getUser().getId())
-            .nickname(review1.getUser().getNickname())
-            .profileImage(review1.getUser().getProfileImage())
-            .build())
-        .build();
-
-    ReviewSimpleResponse response2 = ReviewSimpleResponse.builder()
-        .id(review2.getId())
-        .title(review2.getTitle())
-        .contents(review2.getContents())
-        .updatedAt(LocalDateTime.now())
-        .user(UserSimpleInfo.builder()
-            .id(review2.getUser().getId())
-            .nickname(review2.getUser().getNickname())
-            .profileImage(review2.getUser().getProfileImage())
-            .build())
-        .build();
-
-    List<ReviewSimpleResponse> expected = List.of(response1, response2);
+    List<ReviewSimpleResponse> expected = List.of(
+        ReviewConverter.toReviewSimpleResponse(review1),
+        ReviewConverter.toReviewSimpleResponse(review2));
 
     given(reviewRepository.findReviewsByMovieId(movie.getId()))
         .willReturn(List.of(review1, review2));

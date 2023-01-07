@@ -51,7 +51,7 @@ class RatingServiceTest {
       .nickname("movieStar11")
       .password("test1234")
       .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
-      .profileImage(null)
+      .profileImage("https://blog.kakaocdn.net/dn/bj4oa7/btqLJWFLMgd/wu4GV8PKbXdICuyW0me0zk/img.jpg")
       .authority(UserRole.ROLE_MEMBER)
       .build();
 

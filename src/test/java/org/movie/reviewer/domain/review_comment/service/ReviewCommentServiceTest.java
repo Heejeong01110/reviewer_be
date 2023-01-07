@@ -53,7 +53,7 @@ class ReviewCommentServiceTest {
       .nickname("movieStar11")
       .password("test1234")
       .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
-      .profileImage(null)
+      .profileImage("https://blog.kakaocdn.net/dn/bj4oa7/btqLJWFLMgd/wu4GV8PKbXdICuyW0me0zk/img.jpg")
       .authority(UserRole.ROLE_MEMBER)
       .build();
 
@@ -62,6 +62,7 @@ class ReviewCommentServiceTest {
       .title("결국, 고전이 되었나보다.")
       .contents(
           "개봉 당시에는 이게 고전이 되리라고 생각해본 적 없다. 그러나 뤽 베송의 재능이 쪼그라든 지금 다시 보자니, 울컥하는 감정이 치밀만큼 아름다운 데가 있다.")
+      .likeCount(3L)
       .user(user)
       .movie(movie)
       .build();
