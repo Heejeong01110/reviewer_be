@@ -25,7 +25,8 @@ import org.movie.reviewer.domain.movie.dto.response.ActorInfo;
 import org.movie.reviewer.domain.movie.dto.response.MovieDetailResponse;
 import org.movie.reviewer.domain.movie.dto.response.MovieTitleResponse;
 import org.movie.reviewer.domain.movie.service.MovieService;
-import org.movie.reviewer.global.config.WebSecurityConfig;
+import org.movie.reviewer.global.security.config.WebSecurityConfig;
+import org.movie.reviewer.global.security.config.WithMockCustomUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -122,15 +123,14 @@ class MovieApiTest {
 
 
   @Test
-//  @WithMockUser(username = "movieStar@gamil.com", password = "test1234", roles = "USER")
-  @WithAnonymousUser
+  @WithMockCustomUser
   void givenValidMovieId_whenGetMovie_thenMovieInfo() throws Exception {
     //given
     given(movieService.getMovieById(movie1.getId())).willReturn(movieDetailResponse1);
 
     //when
     ResultActions result = mockMvc.perform(
-        get("/api/v1/movies/{id}",movie1.getId())
+        get("/api/v1/movies/{id}", movie1.getId())
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
     );
