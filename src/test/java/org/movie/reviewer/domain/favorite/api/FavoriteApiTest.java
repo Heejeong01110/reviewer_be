@@ -9,6 +9,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -127,6 +129,7 @@ class FavoriteApiTest {
         .andDo(document("favorite/get-favorites-by-userid",
             preprocessRequest(prettyPrint()),
             preprocessResponse(prettyPrint()),
+            pathParameters(parameterWithName("userId").description("유저 고유번호")),
             responseFields(
                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("즐겨찾기 고유번호"),
                 fieldWithPath("[].movie").type(JsonFieldType.OBJECT).description("영화"),

@@ -8,6 +8,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -130,6 +132,7 @@ class RatingApiTest {
         .andDo(document("rating/get-ratings-by-movieid",
             preprocessRequest(prettyPrint()),
             preprocessResponse(prettyPrint()),
+            pathParameters(parameterWithName("movieId").description("영화 고유번호")),
             responseFields(
                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("평점 고유번호"),
                 fieldWithPath("[].contents").type(JsonFieldType.STRING).description("평점 내용"),
@@ -173,6 +176,7 @@ class RatingApiTest {
         .andDo(document("rating/get-ratings-by-userid",
             preprocessRequest(prettyPrint()),
             preprocessResponse(prettyPrint()),
+            pathParameters(parameterWithName("userId").description("유저 고유번호")),
             responseFields(
                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("평점 고유번호"),
                 fieldWithPath("[].contents").type(JsonFieldType.STRING).description("평점 내용"),
