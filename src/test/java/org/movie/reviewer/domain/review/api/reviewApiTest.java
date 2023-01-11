@@ -30,11 +30,14 @@ import org.movie.reviewer.domain.review.dto.response.UserReviewResponse;
 import org.movie.reviewer.domain.review.service.ReviewService;
 import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.domain.UserRole;
+import org.movie.reviewer.global.security.annotation.WithMockCustomAnonymousUser;
 import org.movie.reviewer.global.security.config.WebSecurityConfig;
-import org.movie.reviewer.global.security.config.WithMockCustomUser;
+import org.movie.reviewer.global.security.annotation.WithMockCustomUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
@@ -47,13 +50,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
-@WebMvcTest(controllers = ReviewApi.class,
-    excludeFilters = {
-        @ComponentScan.Filter(
-            type = FilterType.ASSIGNABLE_TYPE,
-            classes = WebSecurityConfig.class
-        )})
-@MockBean(JpaMetamodelMappingContext.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 @AutoConfigureRestDocs
 class reviewApiTest {
 
@@ -115,7 +113,7 @@ class reviewApiTest {
   }
 
   @Test
-  @WithMockCustomUser
+  @WithMockCustomAnonymousUser
   void whenGetReviews_thenReturnReviews() throws Exception {
     //given
     ReviewTitleInfo info1 = ReviewTitleInfo.builder()
@@ -178,7 +176,7 @@ class reviewApiTest {
 
 
   @Test
-  @WithMockCustomUser
+  @WithMockCustomAnonymousUser
   void givenReviewId_whenGetReview_thenReturnReview() throws Exception {
     //given
     ReflectionTestUtils.setField(review1, "createdAt", getDateTime("2022-10-05 12:36:04"));
@@ -224,7 +222,7 @@ class reviewApiTest {
   }
 
   @Test
-  @WithMockCustomUser
+  @WithMockCustomAnonymousUser
   void givenMovieId_whenGetMovieReviews_thenReturnReviews() throws Exception {
     //given
     ReflectionTestUtils.setField(review1, "createdAt", getDateTime("2022-10-05 12:36:04"));
@@ -265,7 +263,7 @@ class reviewApiTest {
   }
 
   @Test
-  @WithMockCustomUser
+  @WithMockCustomAnonymousUser
   void givenUserId_whenGetReviewsByUserId_thenReturnReviews() throws Exception {
     //given
     ReflectionTestUtils.setField(review1, "createdAt", getDateTime("2022-10-05 12:36:04"));

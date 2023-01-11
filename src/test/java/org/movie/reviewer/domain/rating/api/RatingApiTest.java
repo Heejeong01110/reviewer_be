@@ -27,15 +27,12 @@ import org.movie.reviewer.domain.rating.dto.response.UserRatingResponse;
 import org.movie.reviewer.domain.rating.service.RatingService;
 import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.domain.UserRole;
-import org.movie.reviewer.global.security.config.WebSecurityConfig;
-import org.movie.reviewer.global.security.config.WithMockCustomUser;
+import org.movie.reviewer.global.security.annotation.WithMockCustomAnonymousUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -43,14 +40,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
-@WebMvcTest(controllers = RatingApi.class,
-    excludeFilters = {
-        @ComponentScan.Filter(
-            type = FilterType.ASSIGNABLE_TYPE,
-            classes = WebSecurityConfig.class
-        )})
-@MockBean(JpaMetamodelMappingContext.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 @AutoConfigureRestDocs
 class RatingApiTest {
 
@@ -107,7 +100,7 @@ class RatingApiTest {
   private DateTimeFormatter simpleDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
   @Test
-  @WithMockCustomUser
+  @WithMockCustomAnonymousUser
   void givenMovieId_whenGetRating_thenReturnMovieRating() throws Exception {
     //given
     ReflectionTestUtils.setField(rating1, "createdAt", getDateTime("2022-10-05 12:36:04"));
@@ -151,7 +144,7 @@ class RatingApiTest {
   }
 
   @Test
-  @WithMockCustomUser
+  @WithMockCustomAnonymousUser
   void givenUserId_whenGetRatings_thenReturnRatings() throws Exception {
     //given
     ReflectionTestUtils.setField(rating1, "createdAt", getDateTime("2022-10-05 12:36:04"));

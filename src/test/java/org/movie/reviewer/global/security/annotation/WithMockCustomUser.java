@@ -1,7 +1,8 @@
-package org.movie.reviewer.global.security.config;
+package org.movie.reviewer.global.security.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import org.movie.reviewer.global.security.factory.WithMockCustomUserSecurityContextFactory;
 import org.springframework.security.test.context.support.WithSecurityContext;
 
 @Retention(RetentionPolicy.RUNTIME)
@@ -10,6 +11,6 @@ public @interface WithMockCustomUser {
 
   String username() default "testUser@tgmail.com";
 
-  String password() default "password1234";
+  String password() default "test1234";
   String roles() default "MEMBER";
 }

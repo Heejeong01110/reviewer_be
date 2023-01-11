@@ -25,15 +25,12 @@ import org.movie.reviewer.domain.favorite.service.FavoriteService;
 import org.movie.reviewer.domain.movie.domain.Movie;
 import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.domain.UserRole;
-import org.movie.reviewer.global.security.config.WebSecurityConfig;
-import org.movie.reviewer.global.security.config.WithMockCustomUser;
+import org.movie.reviewer.global.security.annotation.WithMockCustomAnonymousUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -41,13 +38,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
-@WebMvcTest(controllers = FavoriteApi.class,
-    excludeFilters = {
-        @ComponentScan.Filter(
-            type = FilterType.ASSIGNABLE_TYPE,
-            classes = WebSecurityConfig.class
-        )})
-@MockBean(JpaMetamodelMappingContext.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 @AutoConfigureRestDocs
 class FavoriteApiTest {
 
@@ -109,7 +101,7 @@ class FavoriteApiTest {
       .build();
 
   @Test
-  @WithMockCustomUser
+  @WithMockCustomAnonymousUser
   void givenUserId_whenGetReviewsByUserId_thenReturnReviews() throws Exception {
     //given
     List<UserFavoriteResponse> favorites = List.of(

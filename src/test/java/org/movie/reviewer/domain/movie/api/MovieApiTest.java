@@ -27,15 +27,12 @@ import org.movie.reviewer.domain.movie.dto.response.ActorInfo;
 import org.movie.reviewer.domain.movie.dto.response.MovieDetailResponse;
 import org.movie.reviewer.domain.movie.dto.response.MovieTitleResponse;
 import org.movie.reviewer.domain.movie.service.MovieService;
-import org.movie.reviewer.global.security.config.WebSecurityConfig;
-import org.movie.reviewer.global.security.config.WithMockCustomUser;
+import org.movie.reviewer.global.security.annotation.WithMockCustomAnonymousUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -44,13 +41,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
-@WebMvcTest(controllers = MovieApi.class,
-    excludeFilters = {
-        @ComponentScan.Filter(
-            type = FilterType.ASSIGNABLE_TYPE,
-            classes = WebSecurityConfig.class
-        )})
-@MockBean(JpaMetamodelMappingContext.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 @AutoConfigureRestDocs
 class MovieApiTest {
 
@@ -122,9 +114,8 @@ class MovieApiTest {
       .actors(actorInfos)
       .build();
 
-
   @Test
-  @WithMockCustomUser
+  @WithMockCustomAnonymousUser
   void givenValidMovieId_whenGetMovie_thenMovieInfo() throws Exception {
     //given
     given(movieService.getMovieById(movie1.getId())).willReturn(movieDetailResponse1);
@@ -165,7 +156,7 @@ class MovieApiTest {
 
 
   @Test
-  @WithMockCustomUser
+  @WithMockCustomAnonymousUser
   void givenValidUserToken_whenGetMovies_thenMovieList() throws Exception {
     //given
     List<MovieTitleResponse> movies = List.of(

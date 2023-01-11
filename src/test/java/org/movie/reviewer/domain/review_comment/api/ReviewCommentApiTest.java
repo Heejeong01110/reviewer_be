@@ -8,6 +8,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,11 +28,14 @@ import org.movie.reviewer.domain.review_comment.dto.response.UserCommentResponse
 import org.movie.reviewer.domain.review_comment.service.ReviewCommentService;
 import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.domain.UserRole;
+import org.movie.reviewer.global.security.annotation.WithMockCustomAnonymousUser;
 import org.movie.reviewer.global.security.config.WebSecurityConfig;
-import org.movie.reviewer.global.security.config.WithMockCustomUser;
+import org.movie.reviewer.global.security.annotation.WithMockCustomUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
@@ -43,13 +48,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
-@WebMvcTest(controllers = ReviewCommentApi.class,
-    excludeFilters = {
-        @ComponentScan.Filter(
-            type = FilterType.ASSIGNABLE_TYPE,
-            classes = WebSecurityConfig.class
-        )})
-@MockBean(JpaMetamodelMappingContext.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 @AutoConfigureRestDocs
 class ReviewCommentApiTest {
 
@@ -123,7 +123,7 @@ class ReviewCommentApiTest {
   }
 
   @Test
-  @WithMockCustomUser
+  @WithMockCustomAnonymousUser
   void givenReviewId_whenGetReviewComments_thenReturnComments() throws Exception {
     //given
     ReflectionTestUtils.setField(reviewComment1, "createdAt", getDateTime("2022-09-05 12:36:04"));
@@ -151,6 +151,7 @@ class ReviewCommentApiTest {
         .andDo(document("reviewComment/get-reviewComment-by-reviewid",
             preprocessRequest(prettyPrint()),
             preprocessResponse(prettyPrint()),
+            pathParameters(parameterWithName("reviewId").description("리뷰 고유번호")),
             responseFields(
                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("댓글 고유번호"),
                 fieldWithPath("[].contents").type(JsonFieldType.STRING).description("댓글 내용"),
@@ -166,7 +167,7 @@ class ReviewCommentApiTest {
   }
 
   @Test
-  @WithMockCustomUser
+  @WithMockCustomAnonymousUser
   void givenUserId_whenGetReviewCommentsByUserId_thenReturnComments() throws Exception {
     //given
     ReflectionTestUtils.setField(reviewComment1, "createdAt", getDateTime("2022-09-05 12:36:04"));
@@ -194,6 +195,7 @@ class ReviewCommentApiTest {
         .andDo(document("reviewComment/get-reviewComment-by-userid",
             preprocessRequest(prettyPrint()),
             preprocessResponse(prettyPrint()),
+            pathParameters(parameterWithName("userId").description("유저 고유번호")),
             responseFields(
                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("댓글 고유번호"),
                 fieldWithPath("[].contents").type(JsonFieldType.STRING).description("댓글 내용"),
