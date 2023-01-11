@@ -53,9 +53,6 @@ class UserServiceTest {
   @Mock
   private PasswordEncoder passwordEncoder;
 
-  @Mock
-  private UserConverter userConverter;
-
   private Movie movie = Movie.builder()
       .id(0L)
       .country("KR")
@@ -83,15 +80,11 @@ class UserServiceTest {
       .title("결국, 고전이 되었나보다.")
       .contents(
           "개봉 당시에는 이게 고전이 되리라고 생각해본 적 없다. 그러나 뤽 베송의 재능이 쪼그라든 지금 다시 보자니, 울컥하는 감정이 치밀만큼 아름다운 데가 있다.")
+      .likeCount(3L)
       .user(user)
       .movie(movie)
       .build();
-  private ReviewComment reviewComment = ReviewComment.builder()
-      .id(0L)
-      .contents("공감합니다1")
-      .likeCount(3L)
-      .user(user)
-      .review(review).build();
+
   private Rating rating = Rating.builder()
       .id(0L)
       .contents("인생영화임..")
@@ -99,6 +92,7 @@ class UserServiceTest {
       .user(user)
       .movie(movie)
       .build();
+
   private SignUpRequest signUpRequest = SignUpRequest.builder()
       .email(user.getEmail())
       .nickname(user.getNickname())
