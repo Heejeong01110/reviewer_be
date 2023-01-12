@@ -9,6 +9,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestBody;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -108,12 +109,6 @@ class UserApiTest {
       .movie(movie)
       .build();
 
-  private SignUpRequest signUpRequest = SignUpRequest.builder()
-      .email(user.getEmail())
-      .nickname(user.getNickname())
-      .password("test1234")
-      .build();
-
   private DateTimeFormatter simpleDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
   private LocalDateTime getDateTime(String date) {
@@ -192,12 +187,15 @@ class UserApiTest {
   void givenUserEmail_whenCheckEmailDuplicate_thenReturnBoolean() throws Exception {
     //given
     given(userService.isDuplicatedEmail(user.getEmail())).willReturn(true);
+    Map<String, Object> request = new HashMap<>();
+    request.put("email", user.getEmail());
 
     //when
     ResultActions result = mockMvc.perform(
-        get("/api/v1/validity_checks/email/{email}", user.getEmail())
+        post("/api/v1/validity_checks/email", user.getEmail())
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
     );
 
     //then
@@ -205,7 +203,7 @@ class UserApiTest {
         .andDo(document("validity_checks/email",
             preprocessRequest(prettyPrint()),
             preprocessResponse(prettyPrint()),
-            pathParameters(parameterWithName("email").description("검색 이메일"))
+            requestBody(request)
         ));
   }
 
@@ -214,12 +212,15 @@ class UserApiTest {
   void givenUserNickname_whenCheckNicknameDuplicate_thenReturnBoolean() throws Exception {
     //given
     given(userService.isDuplicatedNickname(user.getNickname())).willReturn(true);
+    Map<String, Object> request = new HashMap<>();
+    request.put("nickname", user.getNickname());
 
     //when
     ResultActions result = mockMvc.perform(
-        get("/api/v1/validity_checks/nickname/{nickname}", user.getNickname())
+        post("/api/v1/validity_checks/nickname")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
     );
 
     //then
@@ -227,7 +228,7 @@ class UserApiTest {
         .andDo(document("validity_checks/nickname",
             preprocessRequest(prettyPrint()),
             preprocessResponse(prettyPrint()),
-            pathParameters(parameterWithName("nickname").description("검색 닉네임"))
+            requestBody(request)
         ));
   }
 
@@ -261,7 +262,7 @@ class UserApiTest {
 
   @Test
   @WithMockCustomUser
-  void checkPasswordValid() throws Exception {
+  void givenPassword_whenCheckPasswordValid_thenReturnBoolean() throws Exception {
     //given
     given(userService.checkPasswordValid(user, "test1234")).willReturn(true);
     Map<String, String> request = new HashMap<>();
@@ -285,7 +286,7 @@ class UserApiTest {
 
   @Test
   @WithMockCustomUser
-  void updateUserEmail() throws Exception {
+  void givenEmail_whenUpdateUserEmail_thenReturnUpdatedUser() throws Exception {
     //given
     String updatedEmail = "testEmail@gmail.com";
     User updatedUser = User.builder()
