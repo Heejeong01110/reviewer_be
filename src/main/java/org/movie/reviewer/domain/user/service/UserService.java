@@ -10,6 +10,7 @@ import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.dto.UserConverter;
 import org.movie.reviewer.domain.user.dto.request.SignUpRequest;
 import org.movie.reviewer.domain.user.dto.response.UserDetailResponse;
+import org.movie.reviewer.domain.user.dto.response.UserSimpleInfo;
 import org.movie.reviewer.domain.user.repository.UserRepository;
 import org.movie.reviewer.global.exception.ErrorMessage;
 import org.movie.reviewer.global.exception.NotFoundException;
@@ -56,16 +57,34 @@ public class UserService {
   }
 
 
-  public boolean checkPasswordValid(User user, String password) {
+  public boolean checkPasswordValid(String email, String password) {
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND, email));
     if (!passwordEncoder.matches(password, user.getPassword())) {
       throw new RuntimeException("test중 - 일치하지 않는 이메일입니다.");
     }
     return true;
   }
 
-  public User updateUserEmail(User user, String email) {
-    user.updateEmail(email);
-    userRepository.save(user);
-    return user;
+  public UserSimpleInfo updateUserEmail(String oldEmail, String newEmail) {
+    User user = userRepository.findByEmail(oldEmail)
+        .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND, oldEmail));
+    return UserConverter.toUserSimpleInfo(
+        userRepository.save(UserConverter.toEmailUpdatedUser(user, newEmail)));
   }
+
+  public UserSimpleInfo updateUserNickname(String email, String nickname) {
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND, email));
+    return UserConverter.toUserSimpleInfo(
+        userRepository.save(UserConverter.toNicknameUpdatedUser(user, nickname)));
+  }
+
+  public UserSimpleInfo updateUserPassword(String email, String password) {
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND, email));
+    return UserConverter.toUserSimpleInfo(
+        userRepository.save(UserConverter.toPasswordUpdatedUser(user, password)));
+  }
+
 }

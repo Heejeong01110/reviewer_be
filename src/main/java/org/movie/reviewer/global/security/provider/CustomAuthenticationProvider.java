@@ -17,13 +17,14 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-    String userId = String.valueOf(authentication.getPrincipal());
-    UserDetails userDetails = userDetailsService.loadUserByUsername(userId); //id check
+    String username = String.valueOf(authentication.getPrincipal());
+    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
     JsonPrincipalAuthenticationToken certifiedToken = new JsonPrincipalAuthenticationToken(
         userDetails.getUsername(),
-        userDetails.getPassword(), userDetails.getAuthorities());
-    certifiedToken.setDetails(authentication.getDetails());
+        userDetails.getPassword(),
+        userDetails.getAuthorities());
+    certifiedToken.setDetails(userDetails);
 
     return certifiedToken;
   }

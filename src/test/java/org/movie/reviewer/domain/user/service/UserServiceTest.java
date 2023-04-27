@@ -24,12 +24,12 @@ import org.movie.reviewer.domain.review.domain.Review;
 import org.movie.reviewer.domain.review.dto.ReviewConverter;
 import org.movie.reviewer.domain.review.dto.response.UserReviewResponse;
 import org.movie.reviewer.domain.review.service.ReviewService;
-import org.movie.reviewer.domain.review_comment.domain.ReviewComment;
 import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.domain.UserRole;
 import org.movie.reviewer.domain.user.dto.UserConverter;
 import org.movie.reviewer.domain.user.dto.request.SignUpRequest;
 import org.movie.reviewer.domain.user.dto.response.UserDetailResponse;
+import org.movie.reviewer.domain.user.dto.response.UserSimpleInfo;
 import org.movie.reviewer.domain.user.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -211,13 +211,14 @@ class UserServiceTest {
   @Test
   void checkPasswordValid() {
     //given
+    given(userRepository.findByEmail(user.getEmail())).willReturn(Optional.of(user));
     given(passwordEncoder.matches("test1234", user.getPassword())).willReturn(true);
 
     //when
-    boolean actual = userService.checkPasswordValid(user, "test1234");
+    boolean actual = userService.checkPasswordValid(user.getEmail(), "test1234");
 
     //then
-    then(userService).should().checkPasswordValid(user, "test1234");
+    then(userService).should().checkPasswordValid(user.getEmail(), "test1234");
     assertThat(actual, is(true));
 
   }
@@ -236,15 +237,18 @@ class UserServiceTest {
         .authority(UserRole.ROLE_MEMBER)
         .build();
 
+    UserSimpleInfo expected = UserConverter.toUserSimpleInfo(updatedUser);
+
+    given(userRepository.findByEmail(user.getEmail())).willReturn(Optional.of(user));
     given(userRepository.save(any())).willReturn(updatedUser);
 
     //when
-    User actual = userService.updateUserEmail(user, updatedEmail);
+    UserSimpleInfo actual = userService.updateUserEmail(user.getEmail(), updatedEmail);
 
     //then
-    then(userService).should().updateUserEmail(user, updatedEmail);
+    then(userService).should().updateUserEmail(user.getEmail(), updatedEmail);
     then(userRepository).should().save(any());
-    assertThat(actual, samePropertyValuesAs(updatedUser));
+    assertThat(actual, samePropertyValuesAs(expected));
 
   }
 

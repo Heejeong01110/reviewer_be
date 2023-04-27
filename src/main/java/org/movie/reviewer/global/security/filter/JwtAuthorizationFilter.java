@@ -35,8 +35,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     try {
       String jwt = resolveToken(request, HEADER_PREFIX);
       if (StringUtils.hasText(jwt) && jwtProvider.validAccessToken(jwt)) {
-        Authentication token = jwtProvider.getAuthentication(jwt);
-        Authentication authentication = authenticationManager.authenticate(token);
+        Authentication authentication = jwtProvider.getAuthentication(jwt);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         response.addHeader("AUTH_VALID", "VALID");
       }

@@ -43,6 +43,42 @@ public class UserConverter {
         .build();
   }
 
+  public static User toEmailUpdatedUser(User user, String email) {
+    return User.builder()
+        .id(user.getId())
+        .email(email)
+        .password(user.getPassword())
+        .nickname(user.getNickname())
+        .introduction(user.getIntroduction())
+        .profileImage(user.getProfileImage())
+        .authority(user.getAuthority())
+        .build();
+  }
+
+  public static User toNicknameUpdatedUser(User user, String nickname) {
+    return User.builder()
+        .id(user.getId())
+        .email(user.getEmail())
+        .password(user.getPassword())
+        .nickname(nickname)
+        .introduction(user.getIntroduction())
+        .profileImage(user.getProfileImage())
+        .authority(user.getAuthority())
+        .build();
+  }
+
+  public static User toPasswordUpdatedUser(User user, String password) {
+    return User.builder()
+        .id(user.getId())
+        .email(user.getEmail())
+        .password(password)
+        .nickname(user.getNickname())
+        .introduction(user.getIntroduction())
+        .profileImage(user.getProfileImage())
+        .authority(user.getAuthority())
+        .build();
+  }
+
   public static CustomUserDetails toUserDetails(User user) {
     return new CustomUserDetails(user);
   }

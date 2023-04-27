@@ -13,12 +13,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
+import org.movie.reviewer.domain.user.service.CustomUserDetailsService;
 import org.movie.reviewer.global.security.exception.JwtInvalidException;
 import org.movie.reviewer.global.security.tokens.JsonPrincipalAuthenticationToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -35,15 +37,19 @@ public class JwtProvider {
   private final int expireMin;
   private final int refreshExpireMin;
 
+  private final CustomUserDetailsService userDetailsService;
+
   public JwtProvider(
       @Value("${jwt.secret}") String secretKey,
       @Value("${jwt.refresh-secret}") String refreshSecretKey,
       @Value("${jwt.expire-min}") int expireMin,
-      @Value("${jwt.refresh-expire-min}") int refreshExpireMin) {
+      @Value("${jwt.refresh-expire-min}") int refreshExpireMin,
+      CustomUserDetailsService userDetailsService) {
     this.secretKeyBytes = secretKey.getBytes();
     this.refreshSecretKeyBytes = refreshSecretKey.getBytes();
     this.expireMin = expireMin;
     this.refreshExpireMin = refreshExpireMin;
+    this.userDetailsService = userDetailsService;
   }
 
   public String createAccessToken(String email, String authority) {
@@ -111,7 +117,12 @@ public class JwtProvider {
         Arrays.stream(claims.get(KEY_ROLES).toString().split(","))
             .map(SimpleGrantedAuthority::new).toList();
 
-    return new JsonPrincipalAuthenticationToken(claims.getSubject(), "", authorities);
+    UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
+    JsonPrincipalAuthenticationToken certifiedToken = new JsonPrincipalAuthenticationToken(
+        userDetails, null, userDetails.getAuthorities());
+    certifiedToken.setDetails(userDetails);
+
+    return certifiedToken;
   }
 
   public String getAuthorities(String token){

@@ -2,10 +2,12 @@ package org.movie.reviewer.domain.user.api;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.movie.reviewer.domain.user.domain.User;
+import org.movie.reviewer.domain.user.domain.CustomUserDetails;
 import org.movie.reviewer.domain.user.dto.request.SignUpRequest;
 import org.movie.reviewer.domain.user.dto.response.UserDetailResponse;
+import org.movie.reviewer.domain.user.dto.response.UserSimpleInfo;
 import org.movie.reviewer.domain.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +36,8 @@ public class UserApi {
 
   @PostMapping("validity_checks/email")
   public ResponseEntity<String> checkEmailDuplicate(
-      @RequestBody Map<String, String> emailMap) {
-    if (userService.isDuplicatedEmail(emailMap.get("email"))) {
+      @RequestBody Map<String, String> request) {
+    if (userService.isDuplicatedEmail(request.get("email"))) {
       return ResponseEntity.ok().build();
     }
 
@@ -44,8 +46,8 @@ public class UserApi {
 
   @PostMapping("validity_checks/nickname")
   public ResponseEntity<String> checkNicknameDuplicate(
-      @RequestBody Map<String, String> nicknameMap) {
-    if (userService.isDuplicatedNickname(nicknameMap.get("nickname"))) {
+      @RequestBody Map<String, String> request) {
+    if (userService.isDuplicatedNickname(request.get("nickname"))) {
       return ResponseEntity.ok().build();
     }
 
@@ -60,18 +62,33 @@ public class UserApi {
 
   @PostMapping("validity_checks/password")
   public ResponseEntity<Void> checkPasswordValid(
-      @RequestBody String password,
-      @AuthenticationPrincipal User user) {
-    userService.checkPasswordValid(user, password);
+      @RequestBody Map<String, String> request,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
     return ResponseEntity.ok().build();
   }
 
   @PutMapping("accounts/email")
-  public ResponseEntity<Void> updateUserEmail(
-      @RequestBody String email,
-      @AuthenticationPrincipal User user) {
-    userService.updateUserEmail(user, email);
-    return ResponseEntity.ok().build();
+  public ResponseEntity<UserSimpleInfo> updateUserEmail(
+      @RequestBody Map<String, String> request,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    return ResponseEntity.ok(
+        userService.updateUserEmail(userDetails.getEmail(), request.get("email")));
   }
 
+
+  @PutMapping("accounts/nickname")
+  public ResponseEntity<UserSimpleInfo> updateUserNickname(
+      @RequestBody Map<String, String> request,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    return ResponseEntity.ok(
+        userService.updateUserNickname(userDetails.getEmail(), request.get("nickname")));
+  }
+
+  @PutMapping("accounts/password")
+  public ResponseEntity<UserSimpleInfo> updateUserPassword(
+      @RequestBody Map<String, String> request,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    return ResponseEntity.ok(
+        userService.updateUserPassword(userDetails.getEmail(), request.get("password")));
+  }
 }

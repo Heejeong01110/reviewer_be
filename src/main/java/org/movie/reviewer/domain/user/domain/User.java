@@ -47,7 +47,4 @@ public class User extends BaseEntity {
   @Enumerated(value = EnumType.STRING)
   private UserRole authority;
 
-  public void updateEmail(String email) {
-    this.email = email;
-  }
 }

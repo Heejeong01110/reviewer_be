@@ -36,6 +36,7 @@ import org.movie.reviewer.domain.user.domain.UserRole;
 import org.movie.reviewer.domain.user.dto.UserConverter;
 import org.movie.reviewer.domain.user.dto.request.SignUpRequest;
 import org.movie.reviewer.domain.user.dto.response.UserDetailResponse;
+import org.movie.reviewer.domain.user.dto.response.UserSimpleInfo;
 import org.movie.reviewer.domain.user.service.UserService;
 import org.movie.reviewer.global.security.annotation.WithMockCustomAnonymousUser;
 import org.movie.reviewer.global.security.annotation.WithMockCustomUser;
@@ -87,6 +88,12 @@ class UserApiTest {
       .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
       .profileImage(
           "https://blog.kakaocdn.net/dn/bj4oa7/btqLJWFLMgd/wu4GV8PKbXdICuyW0me0zk/img.jpg")
+      .authority(UserRole.ROLE_MEMBER)
+      .build();
+
+  private User mockUser = User.builder()
+      .email("testUser@tgmail.com")
+      .password("{bcrypt}$2a$12$lIHooMVo0pkCdKr6pxImW.4.2rSZ8iB1yfhKVO8Jy3GeXnDLpmKLa")
       .authority(UserRole.ROLE_MEMBER)
       .build();
 
@@ -264,7 +271,7 @@ class UserApiTest {
   @WithMockCustomUser
   void givenPassword_whenCheckPasswordValid_thenReturnBoolean() throws Exception {
     //given
-    given(userService.checkPasswordValid(user, "test1234")).willReturn(true);
+    given(userService.checkPasswordValid(user.getEmail(), "test1234")).willReturn(true);
     Map<String, String> request = new HashMap<>();
     request.put("password", "test1234");
 
@@ -295,10 +302,14 @@ class UserApiTest {
         .nickname("movieStar11")
         .password("{bcrypt}$2a$10$HvKBACAuzrvJGvpKcb8S3O7RX8uqg72U/dD5TD/3L.ps3c9Ydng6i")
         .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
-        .profileImage("https://blog.kakaocdn.net/dn/bj4oa7/btqLJWFLMgd/wu4GV8PKbXdICuyW0me0zk/img.jpg")
+        .profileImage(
+            "https://blog.kakaocdn.net/dn/bj4oa7/btqLJWFLMgd/wu4GV8PKbXdICuyW0me0zk/img.jpg")
         .authority(UserRole.ROLE_MEMBER)
         .build();
-    given(userService.updateUserEmail(user, updatedEmail)).willReturn(updatedUser);
+    UserSimpleInfo userSimpleInfo = UserConverter.toUserSimpleInfo(updatedUser);
+
+    given(userService.updateUserEmail(mockUser.getEmail(), updatedEmail)).willReturn(userSimpleInfo);
+
     Map<String, String> request = new HashMap<>();
     request.put("email", updatedEmail);
 
@@ -314,7 +325,101 @@ class UserApiTest {
     result.andExpect(status().isOk())
         .andDo(document("accounts/email",
             preprocessRequest(prettyPrint()),
-            preprocessResponse(prettyPrint())
+            preprocessResponse(prettyPrint()),
+            responseFields(
+                fieldWithPath("id").type(JsonFieldType.NUMBER).description("유저 고유번호"),
+                fieldWithPath("nickname").type(JsonFieldType.STRING).description("유저 닉네임"),
+                fieldWithPath("profileImage").type(JsonFieldType.STRING)
+                    .description("유저 프로필 사진 url")
+            )
+        ));
+  }
+
+  @Test
+  @WithMockCustomUser
+  void givenNickname_whenUpdateUserNickname_thenReturnUpdatedUser() throws Exception {
+    //given
+    String updatedNickname = "updatedNickname";
+    User updatedUser = User.builder()
+        .id(0L)
+        .email("testUser@tgmail.com")
+        .nickname(updatedNickname)
+        .password("{bcrypt}$2a$10$HvKBACAuzrvJGvpKcb8S3O7RX8uqg72U/dD5TD/3L.ps3c9Ydng6i")
+        .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
+        .profileImage(
+            "https://blog.kakaocdn.net/dn/bj4oa7/btqLJWFLMgd/wu4GV8PKbXdICuyW0me0zk/img.jpg")
+        .authority(UserRole.ROLE_MEMBER)
+        .build();
+    UserSimpleInfo userSimpleInfo = UserConverter.toUserSimpleInfo(updatedUser);
+
+    given(userService.updateUserNickname(mockUser.getEmail(), updatedNickname)).willReturn(userSimpleInfo);
+
+    Map<String, String> request = new HashMap<>();
+    request.put("nickname", updatedNickname);
+
+    //when
+    ResultActions result = mockMvc.perform(
+        put("/api/v1/accounts/nickname")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+    );
+
+    //then
+    result.andExpect(status().isOk())
+        .andDo(document("accounts/nickname",
+            preprocessRequest(prettyPrint()),
+            preprocessResponse(prettyPrint()),
+            responseFields(
+                fieldWithPath("id").type(JsonFieldType.NUMBER).description("유저 고유번호"),
+                fieldWithPath("nickname").type(JsonFieldType.STRING).description("유저 닉네임"),
+                fieldWithPath("profileImage").type(JsonFieldType.STRING)
+                    .description("유저 프로필 사진 url")
+            )
+        ));
+  }
+
+  @Test
+  @WithMockCustomUser
+  void givenPassword_whenUpdateUserPassword_thenReturnUpdatedUser() throws Exception {
+    //given
+    String updatedPassword = "changePass";
+    User updatedUser = User.builder()
+        .id(0L)
+        .email("testUser@gmail.com")
+        .nickname(updatedPassword)
+        .password("{bcrypt}$2a$12$EYB7DqINuPirZraFsUaFEe2xf6pvXTsv.sQ8bwJYPGXQfgC8Q8TmS") //changePass
+        .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
+        .profileImage(
+            "https://blog.kakaocdn.net/dn/bj4oa7/btqLJWFLMgd/wu4GV8PKbXdICuyW0me0zk/img.jpg")
+        .authority(UserRole.ROLE_MEMBER)
+        .build();
+    UserSimpleInfo userSimpleInfo = UserConverter.toUserSimpleInfo(updatedUser);
+
+    given(userService.updateUserPassword(mockUser.getEmail(), updatedPassword)).willReturn(userSimpleInfo);
+
+    Map<String, String> request = new HashMap<>();
+    request.put("password", updatedPassword);
+
+    //when
+    ResultActions result = mockMvc.perform(
+        put("/api/v1/accounts/password")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+    );
+
+    //then
+    result.andExpect(status().isOk())
+        .andDo(document("accounts/password",
+            preprocessRequest(prettyPrint()),
+            preprocessResponse(prettyPrint()),
+            responseFields(
+                fieldWithPath("id").type(JsonFieldType.NUMBER).description("유저 고유번호"),
+                fieldWithPath("nickname").type(JsonFieldType.STRING).description("유저 닉네임"),
+                fieldWithPath("profileImage").type(JsonFieldType.STRING)
+                    .description("유저 프로필 사진 url")
+            )
         ));
   }
 }
