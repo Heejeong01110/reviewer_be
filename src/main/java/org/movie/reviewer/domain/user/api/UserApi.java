@@ -64,6 +64,7 @@ public class UserApi {
   public ResponseEntity<Void> checkPasswordValid(
       @RequestBody Map<String, String> request,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
+    userService.checkPasswordValid(userDetails.getEmail(), request.get("password"));
     return ResponseEntity.ok().build();
   }
 
