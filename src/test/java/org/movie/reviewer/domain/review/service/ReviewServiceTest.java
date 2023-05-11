@@ -4,10 +4,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -17,9 +17,11 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.movie.reviewer.domain.movie.domain.Movie;
+import org.movie.reviewer.domain.movie.repository.MovieRepository;
 import org.movie.reviewer.domain.rating.service.RatingService;
 import org.movie.reviewer.domain.review.domain.Review;
 import org.movie.reviewer.domain.review.dto.ReviewConverter;
+import org.movie.reviewer.domain.review.dto.request.ReviewCreateRequest;
 import org.movie.reviewer.domain.review.dto.response.ReviewDetailResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewSimpleResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleInfo;
@@ -28,7 +30,8 @@ import org.movie.reviewer.domain.review.dto.response.UserReviewResponse;
 import org.movie.reviewer.domain.review.repository.ReviewRepository;
 import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.domain.UserRole;
-import org.movie.reviewer.domain.user.dto.response.UserSimpleInfo;
+import org.movie.reviewer.domain.user.repository.UserRepository;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
@@ -39,6 +42,12 @@ class ReviewServiceTest {
 
   @Mock
   private ReviewRepository reviewRepository;
+
+  @Mock
+  private MovieRepository movieRepository;
+
+  @Mock
+  private UserRepository userRepository;
 
   @Mock
   private RatingService ratingService;
@@ -215,6 +224,42 @@ class ReviewServiceTest {
       assertThat(actual.get(i).getMovie(), samePropertyValuesAs(expected.get(i).getMovie()));
     }
 
+  }
+
+  @Test
+  void createReviewByRequest() {
+    //given
+    Review newReview = Review.builder()
+        .id(0L)
+        .title("결국, 고전이 되었나보다.")
+        .contents(
+            "개봉 당시에는 이게 고전이 되리라고 생각해본 적 없다. 그러나 뤽 베송의 재능이 쪼그라든 지금 다시 보자니, 울컥하는 감정이 치밀만큼 아름다운 데가 있다.")
+        .likeCount(0L)
+        .user(user)
+        .movie(movie)
+        .build();
+    ReviewCreateRequest request = ReviewCreateRequest.builder()
+        .title(newReview.getTitle())
+        .contents(newReview.getContents())
+        .movieId(newReview.getMovie().getId())
+        .build();
+
+    Review expected = ReviewConverter.toReview(request, movie, user);
+    ReflectionTestUtils.setField(expected, "id", 0L);
+
+    given(movieRepository.findById(request.getMovieId())).willReturn(Optional.of(movie));
+    given(userRepository.findByEmail(user.getEmail())).willReturn(Optional.of(user));
+    given(reviewRepository.save(any())).willReturn(newReview);
+
+    //when
+    Review actual = reviewService.createReview(user.getEmail(), request);
+
+    //then
+    then(reviewService).should().createReview(user.getEmail(), request);
+    then(movieRepository).should().findById(request.getMovieId());
+    then(reviewRepository).should().save(any());
+
+    assertThat(actual, samePropertyValuesAs(expected));
   }
 
 }

@@ -1,13 +1,16 @@
 package org.movie.reviewer.domain.review.dto;
 
+import org.movie.reviewer.domain.movie.domain.Movie;
 import org.movie.reviewer.domain.movie.dto.MovieConverter;
 import org.movie.reviewer.domain.movie.dto.response.MovieSimpleInfo;
 import org.movie.reviewer.domain.review.domain.Review;
+import org.movie.reviewer.domain.review.dto.request.ReviewCreateRequest;
 import org.movie.reviewer.domain.review.dto.response.ReviewDetailResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewSimpleResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleInfo;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleResponse;
 import org.movie.reviewer.domain.review.dto.response.UserReviewResponse;
+import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.dto.UserConverter;
 import org.movie.reviewer.domain.user.dto.response.UserSimpleInfo;
 import org.springframework.stereotype.Component;
@@ -63,6 +66,16 @@ public class ReviewConverter {
         .updatedAt(review.getUpdatedAt())
         .likeCount(review.getLikeCount())
         .movie(MovieConverter.toMovieSimpleInfo(review.getMovie()))
+        .build();
+  }
+
+  public static Review toReview(ReviewCreateRequest request, Movie movie, User user) {
+    return Review.builder()
+        .title(request.getTitle())
+        .contents(request.getContents())
+        .likeCount(0L)
+        .user(user)
+        .movie(movie)
         .build();
   }
 }

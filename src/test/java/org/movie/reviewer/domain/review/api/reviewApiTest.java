@@ -3,6 +3,7 @@ package org.movie.reviewer.domain.review.api;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -15,13 +16,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.movie.reviewer.domain.movie.domain.Movie;
 import org.movie.reviewer.domain.review.domain.Review;
 import org.movie.reviewer.domain.review.dto.ReviewConverter;
+import org.movie.reviewer.domain.review.dto.request.ReviewCreateRequest;
 import org.movie.reviewer.domain.review.dto.response.ReviewDetailResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewSimpleResponse;
 import org.movie.reviewer.domain.review.dto.response.ReviewTitleInfo;
@@ -31,17 +35,12 @@ import org.movie.reviewer.domain.review.service.ReviewService;
 import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.domain.UserRole;
 import org.movie.reviewer.global.security.annotation.WithMockCustomAnonymousUser;
-import org.movie.reviewer.global.security.config.WebSecurityConfig;
 import org.movie.reviewer.global.security.annotation.WithMockCustomUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -53,7 +52,7 @@ import org.springframework.test.web.servlet.ResultActions;
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
-class reviewApiTest {
+class ReviewApiTest {
 
   @Autowired
   private MockMvc mockMvc;
@@ -300,6 +299,60 @@ class reviewApiTest {
                 fieldWithPath("[].movie.movieImage").type(JsonFieldType.STRING)
                     .description("영화 포스터 url")
             )
+        ));
+  }
+
+  @Test
+  @WithMockCustomUser
+  void givenReviewRequest_whenCreateReview_thenReturnReview() throws Exception {
+    //given
+    User user = User.builder()
+        .id(0L)
+        .email("testUser@tgmail.com")
+        .password("{bcrypt}$2a$10$HvKBACAuzrvJGvpKcb8S3O7RX8uqg72U/dD5TD/3L.ps3c9Ydng6i")
+        .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
+        .profileImage(
+            "https://blog.kakaocdn.net/dn/bj4oa7/btqLJWFLMgd/wu4GV8PKbXdICuyW0me0zk/img.jpg")
+        .authority(UserRole.ROLE_MEMBER)
+        .build();
+
+    Review newReview = Review.builder()
+        .id(0L)
+        .title("결국, 고전이 되었나보다.")
+        .contents(
+            "개봉 당시에는 이게 고전이 되리라고 생각해본 적 없다. 그러나 뤽 베송의 재능이 쪼그라든 지금 다시 보자니, 울컥하는 감정이 치밀만큼 아름다운 데가 있다.")
+        .likeCount(0L)
+        .user(user)
+        .movie(movie)
+        .build();
+
+    ReviewCreateRequest reviewCreateRequest = ReviewCreateRequest.builder()
+        .title(newReview.getTitle())
+        .contents(newReview.getContents())
+        .movieId(newReview.getMovie().getId())
+        .build();
+
+    given(reviewService.createReview("testUser@tgmail.com", reviewCreateRequest))
+        .willReturn(newReview);
+
+    Map<String, String> request = new HashMap<>();
+    request.put("title", newReview.getTitle());
+    request.put("contents", newReview.getContents());
+    request.put("movieId", String.valueOf(newReview.getMovie().getId()));
+
+    //when
+    ResultActions result = mockMvc.perform(
+        post("/api/v1/reviews")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+    );
+
+    //then
+    result.andExpect(status().isCreated())
+        .andDo(document("review/create",
+            preprocessRequest(prettyPrint()),
+            preprocessResponse(prettyPrint())
         ));
   }
 
