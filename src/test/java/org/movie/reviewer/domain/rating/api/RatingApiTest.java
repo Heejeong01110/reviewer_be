@@ -3,6 +3,7 @@ package org.movie.reviewer.domain.rating.api;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -15,19 +16,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.movie.reviewer.domain.movie.domain.Movie;
 import org.movie.reviewer.domain.rating.domain.Rating;
 import org.movie.reviewer.domain.rating.dto.RatingConverter;
+import org.movie.reviewer.domain.rating.dto.request.RatingCreateRequest;
 import org.movie.reviewer.domain.rating.dto.response.RatingResponse;
 import org.movie.reviewer.domain.rating.dto.response.UserRatingResponse;
 import org.movie.reviewer.domain.rating.service.RatingService;
 import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.domain.UserRole;
 import org.movie.reviewer.global.security.annotation.WithMockCustomAnonymousUser;
+import org.movie.reviewer.global.security.annotation.WithMockCustomUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -178,8 +183,60 @@ class RatingApiTest {
                 fieldWithPath("[].movie").type(JsonFieldType.OBJECT).description("영화"),
                 fieldWithPath("[].movie.id").type(JsonFieldType.NUMBER).description("영화 고유번호"),
                 fieldWithPath("[].movie.title").type(JsonFieldType.STRING).description("영화명"),
-                fieldWithPath("[].movie.movieImage").type(JsonFieldType.STRING).description("영화 포스터 url")
+                fieldWithPath("[].movie.movieImage").type(JsonFieldType.STRING)
+                    .description("영화 포스터 url")
             )
+        ));
+  }
+
+  @Test
+  @WithMockCustomUser
+  void givenRatingRequest_whenCreateRating_thenReturnRating() throws Exception {
+    //given
+    User user = User.builder()
+        .id(0L)
+        .email("testUser@tgmail.com")
+        .password("{bcrypt}$2a$10$HvKBACAuzrvJGvpKcb8S3O7RX8uqg72U/dD5TD/3L.ps3c9Ydng6i")
+        .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
+        .profileImage(
+            "https://blog.kakaocdn.net/dn/bj4oa7/btqLJWFLMgd/wu4GV8PKbXdICuyW0me0zk/img.jpg")
+        .authority(UserRole.ROLE_MEMBER)
+        .build();
+
+    Rating newRating = Rating.builder()
+        .id(0L)
+        .contents(rating1.getContents())
+        .rating(rating1.getRating())
+        .likeCount(0L)
+        .user(user)
+        .movie(movie)
+        .build();
+
+    RatingCreateRequest ratingCreateRequest = RatingCreateRequest.builder()
+        .contents(newRating.getContents())
+        .rating(newRating.getRating())
+        .build();
+
+    given(ratingService.createRating("testUser@tgmail.com", movie.getId(), ratingCreateRequest))
+        .willReturn(newRating);
+
+    Map<String, String> request = new HashMap<>();
+    request.put("contents", newRating.getContents());
+    request.put("rating", String.valueOf(newRating.getRating()));
+
+    //when
+    ResultActions result = mockMvc.perform(
+        post("/api/v1/movies/{movieId}/ratings", movie.getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+    );
+
+    //then
+    result.andExpect(status().isCreated())
+        .andDo(document("rating/create",
+            preprocessRequest(prettyPrint()),
+            preprocessResponse(prettyPrint())
         ));
   }
 }
