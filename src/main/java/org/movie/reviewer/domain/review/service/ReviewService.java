@@ -53,6 +53,7 @@ public class ReviewService {
         .stream().map(ReviewConverter::toUserReviewResponse).toList();
   }
 
+  @Transactional
   public Review createReview(String email, ReviewCreateRequest request) {
     Movie movie = movieRepository.findById(request.getMovieId())
         .orElseThrow(

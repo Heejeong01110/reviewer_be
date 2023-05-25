@@ -40,6 +40,7 @@ public class RatingService {
         .stream().map(RatingConverter::toUserRatingResponse).toList();
   }
 
+  @Transactional
   public Rating createRating(String email, Long movieId, RatingCreateRequest request) {
     Movie movie = movieRepository.findById(movieId)
         .orElseThrow(() -> new NotFoundException(ErrorMessage.MOVIE_NOT_FOUNDED, movieId));

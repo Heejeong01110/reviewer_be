@@ -66,6 +66,7 @@ public class UserService {
     return true;
   }
 
+  @Transactional
   public UserSimpleInfo updateUserEmail(String oldEmail, String newEmail) {
     User user = userRepository.findByEmail(oldEmail)
         .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND, oldEmail));
@@ -73,6 +74,7 @@ public class UserService {
         userRepository.save(UserConverter.toEmailUpdatedUser(user, newEmail)));
   }
 
+  @Transactional
   public UserSimpleInfo updateUserNickname(String email, String nickname) {
     User user = userRepository.findByEmail(email)
         .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND, email));
@@ -80,6 +82,7 @@ public class UserService {
         userRepository.save(UserConverter.toNicknameUpdatedUser(user, nickname)));
   }
 
+  @Transactional
   public UserSimpleInfo updateUserPassword(String email, String password) {
     User user = userRepository.findByEmail(email)
         .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND, email));
