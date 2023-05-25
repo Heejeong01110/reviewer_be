@@ -257,6 +257,7 @@ class ReviewServiceTest {
     //then
     then(reviewService).should().createReview(user.getEmail(), request);
     then(movieRepository).should().findById(request.getMovieId());
+    then(userRepository).should().findByEmail(user.getEmail());
     then(reviewRepository).should().save(any());
 
     assertThat(actual, samePropertyValuesAs(expected));

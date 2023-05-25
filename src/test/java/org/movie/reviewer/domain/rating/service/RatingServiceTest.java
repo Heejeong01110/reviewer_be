@@ -87,16 +87,16 @@ class RatingServiceTest {
   @Test
   void getRatingScoreByMovieId() {
     //given
-    Double actual = rating1.getRating() + rating2.getRating() / 2;
-    given(ratingRepository.getRatingAvgByMovieId(movie.getId())).willReturn(actual);
+    Double expected = rating1.getRating() + rating2.getRating() / 2;
+    given(ratingRepository.getRatingAvgByMovieId(movie.getId())).willReturn(expected);
 
     //when
-    Double expected = ratingService.getRatingScoreByMovieId(movie.getId());
+    Double actual = ratingService.getRatingScoreByMovieId(movie.getId());
 
     //then
     then(ratingService).should().getRatingScoreByMovieId(movie.getId());
     then(ratingRepository).should().getRatingAvgByMovieId(movie.getId());
-    assertThat(actual, is(expected));
+    assertThat(expected, is(actual));
   }
 
   @Test
