@@ -1,8 +1,10 @@
 package org.movie.reviewer.domain.review_comment.dto;
 
+import org.movie.reviewer.domain.review.domain.Review;
 import org.movie.reviewer.domain.review_comment.domain.ReviewComment;
 import org.movie.reviewer.domain.review_comment.dto.response.ReviewCommentResponse;
 import org.movie.reviewer.domain.review_comment.dto.response.UserCommentResponse;
+import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.dto.UserConverter;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,14 @@ public class ReviewCommentConverter {
         .likeCount(reviewComment.getLikeCount())
         .updatedAt(reviewComment.getUpdatedAt())
         .reviewId(reviewComment.getReview().getId())
+        .build();
+  }
+
+  public static ReviewComment toReviewComment(Review review, User user, String contents) {
+    return ReviewComment.builder()
+        .contents(contents)
+        .user(user)
+        .review(review)
         .build();
   }
 }

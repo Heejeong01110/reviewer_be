@@ -5,10 +5,12 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +19,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.movie.reviewer.domain.movie.domain.Movie;
 import org.movie.reviewer.domain.review.domain.Review;
+import org.movie.reviewer.domain.review.repository.ReviewRepository;
 import org.movie.reviewer.domain.review_comment.domain.ReviewComment;
 import org.movie.reviewer.domain.review_comment.dto.ReviewCommentConverter;
 import org.movie.reviewer.domain.review_comment.dto.response.ReviewCommentResponse;
@@ -24,6 +27,8 @@ import org.movie.reviewer.domain.review_comment.dto.response.UserCommentResponse
 import org.movie.reviewer.domain.review_comment.repository.ReviewCommentRepository;
 import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.domain.UserRole;
+import org.movie.reviewer.domain.user.repository.UserRepository;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewCommentServiceTest {
@@ -34,6 +39,10 @@ class ReviewCommentServiceTest {
 
   @Mock
   private ReviewCommentRepository reviewCommentRepository;
+  @Mock
+  private UserRepository userRepository;
+  @Mock
+  private ReviewRepository reviewRepository;
 
   private Movie movie = Movie.builder()
       .id(0L)
@@ -144,5 +153,36 @@ class ReviewCommentServiceTest {
       assertThat(actual.get(i), samePropertyValuesAs(expected.get(i)));
     }
 
+  }
+
+  @Test
+  void createReviewComment() {
+    //given
+    String contents = "공감합니다4";
+    ReviewComment newReviewComment = ReviewComment.builder()
+        .id(3L)
+        .contents(contents)
+        .user(user)
+        .review(review).build();
+
+    ReviewComment expected = ReviewCommentConverter.toReviewComment(review, user, contents);
+    ReflectionTestUtils.setField(expected, "id", 3L);
+
+    given(reviewRepository.findById(review.getId())).willReturn(Optional.of(review));
+    given(userRepository.findByEmail(user.getEmail())).willReturn(Optional.of(user));
+    given(reviewCommentRepository.save(any())).willReturn(newReviewComment);
+
+    //when
+    ReviewComment actual = reviewCommentService.createReviewComment(review.getId(), user.getEmail(),
+        contents);
+
+    //then
+    then(reviewCommentService).should()
+        .createReviewComment(review.getId(), user.getEmail(), contents);
+    then(reviewRepository).should().findById(review.getId());
+    then(userRepository).should().findByEmail(user.getEmail());
+    then(reviewCommentRepository).should().save(any());
+
+    assertThat(actual, samePropertyValuesAs(expected));
   }
 }

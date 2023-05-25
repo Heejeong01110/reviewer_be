@@ -3,6 +3,7 @@ package org.movie.reviewer.domain.review_comment.api;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -15,7 +16,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,17 +32,12 @@ import org.movie.reviewer.domain.review_comment.service.ReviewCommentService;
 import org.movie.reviewer.domain.user.domain.User;
 import org.movie.reviewer.domain.user.domain.UserRole;
 import org.movie.reviewer.global.security.annotation.WithMockCustomAnonymousUser;
-import org.movie.reviewer.global.security.config.WebSecurityConfig;
 import org.movie.reviewer.global.security.annotation.WithMockCustomUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -203,6 +201,46 @@ class ReviewCommentApiTest {
                 fieldWithPath("[].updatedAt").type(JsonFieldType.STRING).description("업데이트 시간"),
                 fieldWithPath("[].reviewId").type(JsonFieldType.NUMBER).description("리뷰 고유번호")
             )
+        ));
+  }
+
+  @Test
+  @WithMockCustomUser
+  void givenReviewComment_whenCreateReviewComment_thenReturnReviewComment() throws Exception {
+    //given
+    User user = User.builder()
+        .id(0L)
+        .email("testUser@tgmail.com")
+        .password("{bcrypt}$2a$10$HvKBACAuzrvJGvpKcb8S3O7RX8uqg72U/dD5TD/3L.ps3c9Ydng6i")
+        .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
+        .profileImage(
+            "https://blog.kakaocdn.net/dn/bj4oa7/btqLJWFLMgd/wu4GV8PKbXdICuyW0me0zk/img.jpg")
+        .authority(UserRole.ROLE_MEMBER)
+        .build();
+
+    String contents = "공감합니다4";
+    ReviewComment newReviewComment = ReviewComment.builder()
+        .id(3L)
+        .contents(contents)
+        .user(user)
+        .review(review1).build();
+
+    Map<String, String> request = new HashMap<>();
+    request.put("contents", contents);
+
+    //when
+    ResultActions result = mockMvc.perform(
+        post("/api/v1/reviews/{reviewId}/comments", review1.getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+    );
+
+    //then
+    result.andExpect(status().isCreated())
+        .andDo(document("review-comment/create",
+            preprocessRequest(prettyPrint()),
+            preprocessResponse(prettyPrint())
         ));
   }
 }
