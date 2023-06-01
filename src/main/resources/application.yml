@@ -41,7 +41,7 @@ spring:
       platform: h2
 jwt:
   secret: validSecretKey
-  expire-min: 10
+  expire-min: 30
   refresh-secret: refreshSecretKey
   refresh-expire-min: 30
   refresh-reissue-day: 1
