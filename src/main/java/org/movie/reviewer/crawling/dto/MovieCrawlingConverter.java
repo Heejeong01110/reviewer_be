@@ -14,6 +14,7 @@ public class MovieCrawlingConverter {
         .title(dto.getTitle())
         .genre(dto.getGenre().equals("") ? "" : dto.getGenre().split(", ")[0])
         .country(dto.getNation())
+        .movieCode(dto.getMovieCode())
         .runningTime(
             Long.parseLong(dto.getGenre().equals("") ? "0"
                 : dto.getRunningTime().substring(7, dto.getRunningTime().length() - 1)))
