@@ -38,6 +38,7 @@ dependencies {
     implementation "io.jsonwebtoken:jjwt:0.9.1"
     asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    implementation 'org.seleniumhq.selenium:selenium-java:4.1.4'
 }
 
 tasks.named('test') {
