@@ -37,7 +37,7 @@ public class UserApi {
   @PostMapping("validity_checks/email")
   public ResponseEntity<String> checkEmailDuplicate(
       @RequestBody Map<String, String> request) {
-    if (userService.isDuplicatedEmail(request.get("email"))) {
+    if (userService.isUsableEmail(request.get("email"))) {
       return ResponseEntity.ok().build();
     }
 
@@ -47,7 +47,7 @@ public class UserApi {
   @PostMapping("validity_checks/nickname")
   public ResponseEntity<String> checkNicknameDuplicate(
       @RequestBody Map<String, String> request) {
-    if (userService.isDuplicatedNickname(request.get("nickname"))) {
+    if (userService.isUsableNickname(request.get("nickname"))) {
       return ResponseEntity.ok().build();
     }
 

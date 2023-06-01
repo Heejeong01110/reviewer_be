@@ -144,10 +144,10 @@ class UserServiceTest {
     given(userRepository.existsByEmail(user.getEmail())).willReturn(true);
 
     //when
-    boolean actual = userService.isDuplicatedEmail(user.getEmail());
+    boolean actual = userService.isUsableEmail(user.getEmail());
 
     //then
-    then(userService).should().isDuplicatedEmail(user.getEmail());
+    then(userService).should().isUsableEmail(user.getEmail());
     then(userRepository).should().existsByEmail(user.getEmail());
 
     assertThat(actual, is(false));
@@ -159,10 +159,10 @@ class UserServiceTest {
     given(userRepository.existsByNickname(user.getNickname())).willReturn(true);
 
     //when
-    boolean actual = userService.isDuplicatedNickname(user.getNickname());
+    boolean actual = userService.isUsableNickname(user.getNickname());
 
     //then
-    then(userService).should().isDuplicatedNickname(user.getNickname());
+    then(userService).should().isUsableNickname(user.getNickname());
     then(userRepository).should().existsByNickname(user.getNickname());
 
     assertThat(actual, is(false));

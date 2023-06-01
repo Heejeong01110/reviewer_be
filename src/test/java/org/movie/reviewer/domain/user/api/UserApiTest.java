@@ -193,7 +193,7 @@ class UserApiTest {
   @WithMockCustomAnonymousUser
   void givenUserEmail_whenCheckEmailDuplicate_thenReturnBoolean() throws Exception {
     //given
-    given(userService.isDuplicatedEmail(user.getEmail())).willReturn(true);
+    given(userService.isUsableEmail(user.getEmail())).willReturn(true);
     Map<String, Object> request = new HashMap<>();
     request.put("email", user.getEmail());
 
@@ -218,7 +218,7 @@ class UserApiTest {
   @WithMockCustomAnonymousUser
   void givenUserNickname_whenCheckNicknameDuplicate_thenReturnBoolean() throws Exception {
     //given
-    given(userService.isDuplicatedNickname(user.getNickname())).willReturn(true);
+    given(userService.isUsableNickname(user.getNickname())).willReturn(true);
     Map<String, Object> request = new HashMap<>();
     request.put("nickname", user.getNickname());
 

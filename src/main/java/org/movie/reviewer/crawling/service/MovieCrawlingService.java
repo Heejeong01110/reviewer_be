@@ -5,9 +5,11 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.movie.reviewer.crawling.dto.MovieCrawlingConverter;
 import org.movie.reviewer.crawling.dto.MovieWeekRankingDto;
+import org.movie.reviewer.crawling.exception.CrawlingNotWorkingException;
 import org.movie.reviewer.domain.movie.domain.Movie;
 import org.movie.reviewer.domain.movie.repository.ActorRepository;
 import org.movie.reviewer.domain.movie.repository.MovieRepository;
+import org.movie.reviewer.global.exception.ErrorMessage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -78,6 +80,7 @@ public class MovieCrawlingService {
       driver.quit();
     } catch (Exception e) {
       driver.quit();
+      throw new CrawlingNotWorkingException(ErrorMessage.CRAWLING_NOT_WORKING);
     }
     return movieDtoList;
   }

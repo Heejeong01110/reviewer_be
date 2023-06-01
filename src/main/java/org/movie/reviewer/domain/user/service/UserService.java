@@ -11,6 +11,9 @@ import org.movie.reviewer.domain.user.dto.UserConverter;
 import org.movie.reviewer.domain.user.dto.request.SignUpRequest;
 import org.movie.reviewer.domain.user.dto.response.UserDetailResponse;
 import org.movie.reviewer.domain.user.dto.response.UserSimpleInfo;
+import org.movie.reviewer.domain.user.exception.DuplicateEmailException;
+import org.movie.reviewer.domain.user.exception.DuplicateNicknameException;
+import org.movie.reviewer.domain.user.exception.PasswordValidFailException;
 import org.movie.reviewer.domain.user.repository.UserRepository;
 import org.movie.reviewer.global.exception.ErrorMessage;
 import org.movie.reviewer.global.exception.NotFoundException;
@@ -37,19 +40,20 @@ public class UserService {
     return UserConverter.toUserDetailResponse(user, reviews, ratings);
   }
 
-  public boolean isDuplicatedEmail(String email) {
+  public boolean isUsableEmail(String email) {
     return !userRepository.existsByEmail(email);
   }
 
-  public boolean isDuplicatedNickname(String nickname) {
+  public boolean isUsableNickname(String nickname) {
     return !userRepository.existsByNickname(nickname);
   }
 
   @Transactional
   public User save(SignUpRequest request) {
-    if (!isDuplicatedEmail(request.getEmail()) ||
-        !isDuplicatedNickname(request.getNickname())) {
-      throw new RuntimeException("test중 - 아이디 또는 닉네임 중복");
+    if(!isUsableEmail(request.getEmail())){
+      throw new DuplicateEmailException(ErrorMessage.EMAIL_DUPLICATED, request.getEmail());
+    }else if(!isUsableNickname(request.getNickname())){
+      throw new DuplicateNicknameException(ErrorMessage.NICKNAME_DUPLICATED, request.getNickname());
     }
 
     request.encodePassword(passwordEncoder.encode(request.getPassword()));
@@ -61,7 +65,7 @@ public class UserService {
     User user = userRepository.findByEmail(email)
         .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND, email));
     if (!passwordEncoder.matches(password, user.getPassword())) {
-      throw new RuntimeException("test중 - 일치하지 않는 이메일입니다.");
+      throw new PasswordValidFailException(ErrorMessage.PASSWORD_VALID_FAIL);
     }
     return true;
   }
