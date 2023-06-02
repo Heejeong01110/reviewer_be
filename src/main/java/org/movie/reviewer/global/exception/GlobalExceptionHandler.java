@@ -1,7 +1,6 @@
 package org.movie.reviewer.global.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.movie.reviewer.crawling.exception.CrawlingNotWorkingException;
 import org.movie.reviewer.domain.user.exception.DuplicateEmailException;
 import org.movie.reviewer.domain.user.exception.DuplicateNicknameException;
 import org.movie.reviewer.domain.user.exception.PasswordValidFailException;
@@ -17,12 +16,6 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleNotFound(NotFoundException exception) {
     log.error(exception.getMessage());
     return ResponseEntity.badRequest().body(exception.getMessage());
-  }
-
-  @ExceptionHandler
-  public ResponseEntity<String> handleCrawlingNotWorking(CrawlingNotWorkingException exception) {
-    log.error(exception.getMessage());
-    return ResponseEntity.internalServerError().body(exception.getMessage());
   }
 
   @ExceptionHandler
