@@ -37,6 +37,7 @@ public class Review extends BaseEntity {
   @Column(nullable = false, length = 50000)
   private String contents;
 
+  //todo 고치기
   @Column(nullable = false)
   private Long likeCount;
 

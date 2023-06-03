@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
+  //todo 나중에 깔끔하게 정리하기
   @Query("SELECT "
       + "new org.movie.reviewer.domain.review.dto.response.ReviewTitleInfo "
       + "(r.id, r.title, count(c.id), u.id, u.nickname, u.profileImage, m.id, m.title, m.movieImage) FROM Review r "

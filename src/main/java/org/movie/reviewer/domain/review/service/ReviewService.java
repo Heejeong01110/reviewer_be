@@ -53,6 +53,7 @@ public class ReviewService {
         .stream().map(ReviewConverter::toUserReviewResponse).toList();
   }
 
+  //todo 동명의 영화를 검색해서 movieId를 받을 수 있게 프론트엔드 쪽 작업 필요
   @Transactional
   public Review createReview(String email, ReviewCreateRequest request) {
     Movie movie = movieRepository.findById(request.getMovieId())
