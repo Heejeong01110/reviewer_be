@@ -31,7 +31,7 @@ public class ReviewComment extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false, length = 300)
+  @Column(nullable = false, columnDefinition = "TEXT")
   private String contents;
 
   @Column

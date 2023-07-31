@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,7 +29,7 @@ public class Movie {
   @Column(unique = true)
   private String movieCode;
 
-  @Column(nullable = false, length = 100)
+  @Column(nullable = false, columnDefinition = "TEXT")
   private String title;
 
   @Column(nullable = false, length = 30)
@@ -40,13 +41,13 @@ public class Movie {
   @Column(nullable = false)
   private Long runningTime;
 
-  @Column(nullable = false, length = 300)
+  @Column(nullable = false, columnDefinition = "TEXT")
   private String movieImage;
 
-  @Column(nullable = false, length = 30)
+  @Column(nullable = false, columnDefinition = "TEXT")
   private String director;
 
-  @Column(length = 20000)
+  @Column(nullable = false, columnDefinition = "LONGTEXT")
   private String summary;
 
 }

@@ -33,7 +33,6 @@ public class RatingLike {
   @Column
   private Long likeType;
 
-
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(referencedColumnName = "id")
   private User user;

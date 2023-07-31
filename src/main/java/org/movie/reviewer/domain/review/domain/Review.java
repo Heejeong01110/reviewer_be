@@ -31,10 +31,10 @@ public class Review extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false, length = 500)
+  @Column(nullable = false, columnDefinition = "TEXT")
   private String title;
 
-  @Column(nullable = false, length = 50000)
+  @Column(nullable = false, columnDefinition = "LONGTEXT")
   private String contents;
 
   //todo 고치기

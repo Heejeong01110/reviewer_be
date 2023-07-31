@@ -31,7 +31,7 @@ public class Rating extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(length = 300)
+  @Column(nullable = false, columnDefinition = "TEXT")
   private String contents;
 
   @Column
