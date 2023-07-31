@@ -1,0 +1,48 @@
+spring:
+  redis:
+    lettuce:
+      pool:
+        max-active: 5
+        max-idle: 5
+        min-idle: 2
+    host: 127.0.0.1
+    port: 6379
+    password: 'abcde'
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: "jdbc:h2:mem:reviewer_test_db;MODE=MYSQL;DB_CLOSE_DELAY=-1"
+    username: sa
+    password:
+    hikari:
+      minimum-idle: 1
+      maximum-pool-size: 5
+      pool-name: H2_DB
+  jpa:
+    show-sql: true
+    defer-datasource-initialization: true
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+  sql:
+    init:
+      data-locations: classpath:data/dummyData.sql
+      mode: always
+      platform: h2
+jwt:
+  secret: validSecretKey
+  expire-min: 30
+  refresh-secret: refreshSecretKey
+  refresh-expire-min: 30
+  refresh-reissue-day: 1
+logging:
+  level:
+    root: info
