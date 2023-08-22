@@ -64,6 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http
         .httpBasic().disable() // rest api 이므로 기본설정 사용안함. 기본설정은 비인증시 로그인폼 화면으로 리다이렉트 된다.
         .csrf().disable() //csrf 설정
+        .cors().and()
         .headers() //h2-console 사용 설정
         .frameOptions()
         .sameOrigin()
