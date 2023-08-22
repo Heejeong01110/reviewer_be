@@ -37,10 +37,10 @@ public class User extends BaseEntity {
   @Column(nullable = false, unique = true, length = 20)
   private String nickname;
 
-  @Column(nullable = false, columnDefinition = "LONGTEXT")
+  @Column(columnDefinition = "LONGTEXT")
   private String introduction;
 
-  @Column(nullable = false, columnDefinition = "TEXT")
+  @Column(columnDefinition = "TEXT")
   private String profileImage;
 
   @Column(nullable = false)
