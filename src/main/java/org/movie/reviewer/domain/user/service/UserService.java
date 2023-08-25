@@ -94,4 +94,8 @@ public class UserService {
         userRepository.save(UserConverter.toPasswordUpdatedUser(user, password)));
   }
 
+  public UserSimpleInfo getUserByEmail(String email) {
+    return UserConverter.toUserSimpleInfo(userRepository.findByEmail(email)
+        .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND, email)));
+  }
 }

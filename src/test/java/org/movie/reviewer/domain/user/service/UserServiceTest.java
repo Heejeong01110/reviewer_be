@@ -252,4 +252,32 @@ class UserServiceTest {
 
   }
 
+  @Test
+  void getUserByEmail() {
+    //given
+    String email = "testEmail@gmail.com";
+    User user = User.builder()
+        .id(0L)
+        .email(email)
+        .nickname("movieStar11")
+        .password("{bcrypt}$2a$10$HvKBACAuzrvJGvpKcb8S3O7RX8uqg72U/dD5TD/3L.ps3c9Ydng6i")
+        .introduction("안녕하세요 영화를 좋아하는 영화인입니다.")
+        .profileImage(
+            "https://blog.kakaocdn.net/dn/bj4oa7/btqLJWFLMgd/wu4GV8PKbXdICuyW0me0zk/img.jpg")
+        .authority(UserRole.ROLE_MEMBER)
+        .build();
+
+    UserSimpleInfo expected = UserConverter.toUserSimpleInfo(user);
+
+    given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
+    given(userRepository.save(any())).willReturn(user);
+
+    //when
+    UserSimpleInfo actual = userService.updateUserEmail(user.getEmail(), email);
+
+    //then
+    then(userService).should().updateUserEmail(user.getEmail(), email);
+    then(userRepository).should().save(any());
+    assertThat(actual, samePropertyValuesAs(expected));
+  }
 }

@@ -34,6 +34,12 @@ public class UserApi {
     return ResponseEntity.ok(userService.getUserById(userId));
   }
 
+  @GetMapping("accounts/me")
+  public ResponseEntity<UserSimpleInfo> getUserByToken(
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    return ResponseEntity.ok(userService.getUserByEmail(userDetails.getEmail()));
+  }
+
   @PostMapping("validity_checks/email")
   public ResponseEntity<String> checkEmailDuplicate(
       @RequestBody Map<String, String> request) {
