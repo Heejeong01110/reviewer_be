@@ -9,6 +9,9 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 public class CorsConfig {
 
+  private static final String HEADER_PREFIX = "Authorization";
+  private static final String REFRESH_HEADER_PREFIX = "Authorization-refresh";
+
   @Bean
   public CorsFilter corsFilter() {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -17,6 +20,8 @@ public class CorsConfig {
     config.addAllowedOriginPattern("*");  // 모든 ip에 응답을 허용
     config.addAllowedHeader("*");  // 모든 header에 응답을 허용
     config.addAllowedMethod("*");  // 모든 post, get, put, delete, patch 요청을 허용
+    config.addExposedHeader(HEADER_PREFIX);
+    config.addExposedHeader(REFRESH_HEADER_PREFIX);
     source.registerCorsConfiguration("/api/v1/**", config);
     return new CorsFilter(source);
   }
